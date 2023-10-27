@@ -3,7 +3,7 @@ import {FlatList, StyleSheet,  Text, View, TextInput, TouchableOpacity, ScrollVi
 import { fontType, colors } from './../theme';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { CategoryList, ListOfItems } from '../../data';
-import {ListItems, ListHorizontal} from './../components';
+import {ListItems} from './../components';
 
 export default function Home() {
     const [text, onChangeText] = useState('Search')
@@ -27,7 +27,11 @@ export default function Home() {
             <View style = {styles.listCategory}>
                 <ListCategory/>
             </View>
-            <ItemItem />
+            <ScrollView showsVerticalScrollIndicator={false}>
+                <View style={styles.itemContainer}>
+                    <ListItems data={ListOfItems}/>
+                </View>
+            </ScrollView>
         </View>
     );
 }
@@ -39,18 +43,6 @@ const Header = () => {
         </View>
     )
 }
-
-
-const ItemItem = () => {
-    const horizontalData = ListOfItems.slice(0, 5);
-    return (
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.listBlog}>
-          <ListItems data={horizontalData} />
-        </View>
-      </ScrollView>
-    );
-  };
 
 const ListCategory = () => {
     const [selected, setSelected] = useState(1)
@@ -129,13 +121,17 @@ const styles = StyleSheet.create({
         alignItems:'center',
         marginVertical:21,
         
+    },
+    itemContainer:{
+        alignItems:'center',
+        paddingVertical:14,
     }
 })
 
 const category = StyleSheet.create({
     item:{
         paddingHorizontal:14,
-        paddingVertical:10,
+        paddingVertical:7,
         borderRadius:25,
         alignItems:'center',
         backgroundColor: colors.grey(0.08),

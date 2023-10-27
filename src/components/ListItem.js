@@ -5,7 +5,7 @@ import FastImage from 'react-native-fast-image';
 import { fontType, colors } from '../theme';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-const ContainerItem = ({item, variant, onPress}) => {
+const ContainerItem = ({item, onPress}) => {
   return (
     <View style={listItems.cardItem}>
       <FastImage
@@ -22,13 +22,11 @@ const ContainerItem = ({item, variant, onPress}) => {
             <Text style={listItems.cardTitle}>{item.name}</Text>
             <Text style={listItems.cardText}>{item.price}</Text>
           </View>
-          <View>
           <View style={listItems.cardIcon}>
               <TouchableOpacity style={listItems.cardIconItem} onPress={onPress}>
                   <Icon name='heart' solid size={16} color={colors.black()} />
                   <Icon name='shopping-cart' size={16} color={colors.black()} />
               </TouchableOpacity>
-          </View>
           </View>
         </View>
     </View>
@@ -57,9 +55,8 @@ const ListItems = ({data}) => {
       keyExtractor={item => item.id}
       renderItem={item => renderItem({...item})}
       ItemSeparatorComponent={() => <View style={{width: 15}} />}
-      contentContainerStyle={{paddingHorizontal: 24}}
-      horizontal
       showsHorizontalScrollIndicator={false}
+      numColumns={2}
     />
   );
 };
@@ -67,49 +64,46 @@ export default ListItems;
 
 const listItems = StyleSheet.create({
   cardItem: {
-      width: 180,
-      justifyContent:'space-between',
+      width: 170,
       alignItems:'center',
-      backgroundColor:colors.black(.1),
+      backgroundColor:colors.black(.09),
       borderRadius:7,
-      padding:14,
+      marginHorizontal:7,
+      marginVertical:14,
+      position:'relative',
+      paddingBottom:7
   },
   cardImage: {
       width: 100,
       height: 100,
       borderRadius: 15,
-      borderWidth:2,
+      marginVertical:14,
   },
   cardContent: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
-      padding: 15,
-      borderWidth:1,
-      position:'relative'
+      maxWidth:'100%',
   },
   cardInfo: {
-      // justifyContent: 'flex-end',
-      borderWidth:2,
+      width:'77%',
+      paddingHorizontal:7,
   },
   cardTitle: {
-      fontFamily: fontType['mts-Bold'],
+      fontFamily: fontType['pps-Regular'],
       fontSize: 14,
       color: colors.black(),
+      flexWrap:'wrap'
   },
   cardText: {
       fontSize: 10,
       color: colors.black(),
-      fontFamily: fontType['Pjs-Medium'],
+      fontFamily: fontType['pps-Regular'],
   },
   cardIcon: {
-      backgroundColor: colors.black(0.33),
-      borderWidth: 0.5,
-      borderRadius: 5,
-      position:'absolute',
-      right:0,
-      top:0
+      width:'23%'
   },
   cardIconItem:{
-    flexDirection:'row'
+    flexDirection:'row',
+    justifyContent:'space-between',
+    paddingRight:7
   }
 })
