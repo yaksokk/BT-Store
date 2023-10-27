@@ -89,7 +89,6 @@ const listItems = StyleSheet.create({
   },
   cardInfo: {
       // justifyContent: 'flex-end',
-      // maxWidth: '100%',
       borderWidth:2,
   },
   cardTitle: {
