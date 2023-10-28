@@ -27,19 +27,27 @@ export default function Home() {
             <View style = {styles.listCategory}>
                 <ListCategory/>
             </View>
-            <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.itemContainer}>
-                    <ListItems data={ListOfItems}/>
+                    <ItemItem/>
                 </View>
-            </ScrollView>
         </View>
     );
+}
+
+const ItemItem = () => {
+    return(
+        <ScrollView showsVerticalScrollIndicator={false}>
+        <View>
+            <ListItems data={ListOfItems}/>
+        </View>
+        </ScrollView>
+    )
 }
 
 const Header = () => {
     return(
         <View style={headers.header}>
-            <Text style={headers.title}>Discover Your Unique Look</Text>
+            <Text style={headers.title}>Discover Your Badminton Look</Text>
         </View>
     )
 }
@@ -82,11 +90,11 @@ const ItemCategory = ({item, onPress, color}) => {
 
 const headers = StyleSheet.create({
     header:{
-        marginVertical:7,
+        margin:7,
     },
     title:{
         fontFamily:fontType['pps-Medium'],
-        fontSize:48,
+        fontSize:42,
         color: colors.black(),
         textAlign:'center'
     }
