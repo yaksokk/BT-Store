@@ -1,9 +1,9 @@
 import React, {useState}  from 'react';
 import {FlatList, StyleSheet,  Text, View, TextInput, TouchableOpacity, ScrollView} from 'react-native'
-import { fontType, colors } from './../theme';
+import { fontType, colors } from './../../theme';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import { CategoryList, ListOfItems } from '../../data';
-import {ListItems} from './../components';
+import { CategoryList, ListOfItems } from '../../../data';
+import {ListItems} from './../../components';
 
 export default function Home() {
     const [text, onChangeText] = useState('Search')

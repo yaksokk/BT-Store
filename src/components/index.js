@@ -1,2 +1,3 @@
 import ListItems from './ListItem'
-export {ListItems}
+import ItemSmall from './ItemSmall'
+export {ListItems, ItemSmall}

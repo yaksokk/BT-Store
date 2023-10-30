@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {Home} from './src/screens/'
+import {Home,Profile} from './src/screens/'
 
 export default function App(){
-  return <Home/>
+  return <Profile/>
 }
