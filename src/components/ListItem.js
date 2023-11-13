@@ -1,13 +1,15 @@
-import {StyleSheet, Text, View, FlatList, TouchableOpacity} from 'react-native';
 import React, {useState} from 'react';
-import {Receipt21} from 'iconsax-react-native';
-import FastImage from 'react-native-fast-image';
 import { fontType, colors } from '../theme';
+import FastImage from 'react-native-fast-image';
+import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import {StyleSheet, Text, View, FlatList,SafeAreaView, SectionList, TouchableOpacity} from 'react-native';
+import { ListOfItems } from '../../data';
 
 const ContainerItem = ({item, onPress}) => {
+  const navigation = useNavigation();
   return (
-    <View style={listItems.cardItem}>
+    <TouchableOpacity style={listItems.cardItem} onPress={() => navigation.navigate('BlogDetail', {blogId: item.id})}>
       <FastImage
         style={listItems.cardImage}
         source={{
@@ -23,16 +25,15 @@ const ContainerItem = ({item, onPress}) => {
             <Text style={listItems.cardText}>{item.price}</Text>
           </View>
           <View style={listItems.cardIcon}>
-              <TouchableOpacity style={listItems.cardIconItem} onPress={onPress}>
-                  <Icon name='heart' solid size={16} color={colors.black()} />
-                  <Icon name='shopping-cart' size={16} color={colors.black()} />
+              <TouchableOpacity onPress={onPress}>
+                  <Icon name='heart'  size={21} color={colors.black()} />
               </TouchableOpacity>
           </View>
         </View>
-    </View>
+    </TouchableOpacity>
   );
 };
-const ListItems = ({data}) => {
+const ListItems = ({}) => {
   const [bookmark, setBookmark] = useState([]);
   const toggleBookmark = itemId => {
     if (bookmark.includes(itemId)) {
@@ -40,24 +41,40 @@ const ListItems = ({data}) => {
     } else {
       setBookmark([...bookmark, itemId]);
     }
-  };
-  const renderItem = ({item}) => {
-    return (
-      <ContainerItem
-        item={item}
-        onPress={() => toggleBookmark(item.id)}
-      />
-    );
-  };
+  }
   return (
-    <FlatList
-      data={data}
-      keyExtractor={item => item.id}
-      renderItem={item => renderItem({...item})}
-      ItemSeparatorComponent={() => <View style={{width: 15}} />}
-      showsHorizontalScrollIndicator={false}
-      numColumns={2}
-    />
+    <View>
+      <SafeAreaView style={{flex:1}}>
+        <SectionList
+          contentContainerStyle={{paddingHorizontal:10}}
+          stickySectionHeaderEnabled={false}
+          sections={ListOfItems}
+          renderSectionHeader={({section}) =>(
+            <>
+              <Text>{section.title}</Text>
+              {section.horizontal ? (
+                <FlatList
+                horizontal
+                data={section.data}
+                renderItem={({item}) => <ContainerItem item={item}/>}
+                showsHorizontalScrollIndicator={false}
+                />
+              ): null}
+            </>
+            )}
+            renderItem = {({item, section}) => {
+              if(section.horizontal){
+                return null
+              }
+              return (
+                <ContainerItem
+                  item={item}
+                  onPress={() => toggleBookmark(item.id)}/>
+              )
+            }}
+          />
+      </SafeAreaView>
+    </View>
   );
 };
 export default ListItems;
@@ -84,7 +101,7 @@ const listItems = StyleSheet.create({
       maxWidth:'100%',
   },
   cardInfo: {
-      width:'77%',
+      width:'75%',
       paddingHorizontal:7,
   },
   cardTitle: {
@@ -99,11 +116,8 @@ const listItems = StyleSheet.create({
       fontFamily: fontType['pps-Regular'],
   },
   cardIcon: {
-      width:'23%'
+      width:'23%',
+      alignItems:'center'
   },
-  cardIconItem:{
-    flexDirection:'row',
-    justifyContent:'space-between',
-    paddingRight:7
-  }
+  
 })

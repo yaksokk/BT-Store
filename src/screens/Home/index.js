@@ -1,9 +1,9 @@
 import React, {useState}  from 'react';
-import {FlatList, StyleSheet,  Text, View, TextInput, TouchableOpacity, ScrollView} from 'react-native'
-import { fontType, colors } from './../../theme';
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import { CategoryList, ListOfItems } from '../../../data';
 import {ListItems} from './../../components';
+import { fontType, colors } from './../../theme';
+import { CategoryList, ListOfItems } from '../../../data';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import {FlatList, StyleSheet,  Text, View, TextInput, TouchableOpacity, ScrollView} from 'react-native'
 
 export default function Home() {
     const [text, onChangeText] = useState('Search')
@@ -27,19 +27,15 @@ export default function Home() {
             <View style = {styles.listCategory}>
                 <ListCategory/>
             </View>
-                <View style={styles.itemContainer}>
-                    <ItemItem/>
-                </View>
+            <ItemItem/>
         </View>
     );
 }
 
 const ItemItem = () => {
     return(
-        <ScrollView showsVerticalScrollIndicator={false}>
-        <View>
+        <ScrollView horizontal={true} showsVerticalScrollIndicator={false}>
             <ListItems data={ListOfItems}/>
-        </View>
         </ScrollView>
     )
 }

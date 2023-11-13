@@ -1,12 +1,15 @@
-import {StyleSheet, Text, View} from 'react-native';
-import FastImage from 'react-native-fast-image';
-import {Receipt21, Clock, Message} from 'iconsax-react-native';
 import React from 'react';
 import { fontType, colors } from '../theme';
+import FastImage from 'react-native-fast-image';
+import {useNavigation} from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import {Receipt21, Clock, Message} from 'iconsax-react-native';
+import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 
 const ItemSmall = ({item}) => {
+  const navigation = useNavigation();
   return (
-    <View style={styles.cardItem}>
+    <TouchableOpacity style={styles.cardItem} onPress={() => navigation.navigate('BlogDetail', {blogId: item.id})}>
       <FastImage
         style={styles.cardImage}
         source={{
@@ -32,8 +35,14 @@ const ItemSmall = ({item}) => {
             size={20}
           />
         </View>
+        <View style={styles.cardInfo}>
+          <Icon name='thumbs-up' size={10} color={colors.grey(0.7)} />
+          <Text style={styles.cardText}>{item.totalLikes}</Text>
+          <Icon name='comment-dots' size={10} color={colors.grey(0.7)} />
+          <Text style={styles.cardText}>{item.totalComments}</Text>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -52,18 +61,28 @@ const styles = StyleSheet.create({
   cardCategory: {
     color: colors.blue(),
     fontSize: 10,
-    fontFamily: fontType['pps-Bold'],
+    fontFamily: fontType['Pjs-SemiBold'],
   },
   cardTitle: {
     fontSize: 14,
-    fontFamily: fontType['pps-Bold'],
+    fontFamily: fontType['Pjs-Bold'],
     color: colors.black(),
+  },
+  cardText: {
+    fontSize: 10,
+    fontFamily: fontType['Pjs-Medium'],
+    color: colors.grey(0.6),
   },
   cardImage: {
     width: 94,
     height: 94,
     borderRadius: 10,
     resizeMode: 'cover',
+  },
+  cardInfo: {
+    flexDirection: 'row',
+    gap: 5,
+    alignItems: 'center',
   },
   cardContent: {
     gap: 10,

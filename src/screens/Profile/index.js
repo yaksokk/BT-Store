@@ -1,10 +1,10 @@
-import {ScrollView, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
-import {Setting2} from 'iconsax-react-native';
 import React from 'react';
-import FastImage from 'react-native-fast-image';
-import {ProfileData, BlogList, ListOfItems} from '../../../data';
 import {ItemSmall} from '../../components';
+import {Setting2} from 'iconsax-react-native';
 import { fontType, colors } from '../../theme';
+import FastImage from 'react-native-fast-image';
+import {ProfileData, ListOfItems} from '../../../data';
+import {ScrollView, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 
 const formatNumber = number => {
   if (number >= 1000000000) {
@@ -19,8 +19,9 @@ const formatNumber = number => {
   return number.toString();
 };
 
-const data = ListOfItems.slice(1);
-const Profile = () => {
+const Profile = ({route}) => {
+  const blogId = route.params
+  const data = ListOfItems.flatMap(item => item.data).find(blog => blog.id === blogId);
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -72,8 +73,13 @@ const Profile = () => {
           </TouchableOpacity>
         </View>
         <View style={{paddingVertical: 10, gap:10}}>
-          {data.map((item, index) => (
-            <ItemSmall item={item} key={index} />
+          {ListOfItems.slice(2).map((category, categoryIndex) => (
+            <View key={categoryIndex}>
+              <Text style={styles.categoryTitle}>{category.title}</Text>
+              {category.data.map((item, index) => (
+                <ItemSmall item={item} key={index} />
+              ))}
+            </View>
           ))}
         </View>
       </ScrollView>
