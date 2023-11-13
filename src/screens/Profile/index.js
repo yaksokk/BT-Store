@@ -1,6 +1,6 @@
 import React from 'react';
 import {ItemSmall} from '../../components';
-import {Setting2} from 'iconsax-react-native';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import { fontType, colors } from '../../theme';
 import FastImage from 'react-native-fast-image';
 import {ProfileData, ListOfItems} from '../../../data';
@@ -25,7 +25,7 @@ const Profile = ({route}) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Setting2 color={colors.black()} variant="Linear" size={24} />
+        <Icon name='cog' size={24} color={colors.black()} />
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
