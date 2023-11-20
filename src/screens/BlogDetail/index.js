@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {ListOfItems} from '../../../data';
 import { fontType, colors } from '../../theme';
 import FastImage from 'react-native-fast-image';
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {StyleSheet, Text, View, ScrollView, TouchableOpacity} from 'react-native';
+import {Animated, StyleSheet, Text, View, ScrollView, TouchableOpacity} from 'react-native';
 
 const formatNumber = number => {
   if (number >= 1000000000) {
@@ -39,9 +39,23 @@ const BlogDetail = ({route}) => {
       },
     }));
   };
+
+    // Buat Animation
+    const scrollY = useRef(new Animated.Value(0)).current;
+    const diffClampY = Animated.diffClamp(scrollY, 0, 52);
+    const headerY = diffClampY.interpolate({
+      inputRange: [0, 52],
+      outputRange: [0, -52],
+    });
+    const bottomBarY = diffClampY.interpolate({
+      inputRange: [0, 52],
+      outputRange: [0, 52],
+    });
+
+
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <Animated.View style={[styles.header, {transform: [{translateY: headerY}]}]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name='arrow-left' size={24} color={colors.grey(0.7)} />
         </TouchableOpacity>
@@ -49,9 +63,13 @@ const BlogDetail = ({route}) => {
           <Icon name='share' size={24} color={colors.grey(0.7)} />
           <Icon name='ellipsis-v' size={24} color={colors.grey(0.7)} />
         </View>
-      </View>
-      <ScrollView
+      </Animated.View>
+      <Animated.ScrollView
         showsVerticalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{nativeEvent: {contentOffset: {y: scrollY}}}],
+          {useNativeDriver: true},
+        )}
         contentContainerStyle={{
           paddingHorizontal: 24,
           paddingTop: 62,
@@ -77,8 +95,9 @@ const BlogDetail = ({route}) => {
         </View>
         <Text style={styles.name}>{selectedBlog.name}</Text>
         <Text style={styles.content}>{selectedBlog.content}</Text>
-      </ScrollView>
-      <View style={styles.bottomBar}>
+      </Animated.ScrollView>
+      <Animated.View 
+        style={[styles.bottomBar, {transform: [{translateY: bottomBarY}]}]}>
         <View style={{flexDirection:'row', gap:5, alignItems:'center'}}>
           <TouchableOpacity onPress={() => toggleIcon('liked')}>
           <Icon name='thumbs-up' size={24} color={iconStates.liked.color} />
@@ -96,7 +115,7 @@ const BlogDetail = ({route}) => {
         <TouchableOpacity onPress={() => toggleIcon('bookmarked')}>
         <Icon name='list-alt' size={24} color={iconStates.bookmarked.color} />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
     </View>
   );
 };
