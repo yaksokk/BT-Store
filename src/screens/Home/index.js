@@ -16,10 +16,10 @@ import {
 export default function Home() {
   const [text, onChangeText] = useState('Search');
   const scrollY = useRef(new Animated.Value(0)).current;
-  const diffClampY = Animated.diffClamp(scrollY, 0, 150);
+  const diffClampY = Animated.diffClamp(scrollY, 0, 142);
   const recentY = diffClampY.interpolate({
-    inputRange: [0, 150],
-    outputRange: [0, -150],
+    inputRange: [0, 142],
+    outputRange: [0, -142],
     extrapolate: 'clamp',
   });
   return (
@@ -40,31 +40,29 @@ export default function Home() {
       </View>
       <Animated.View
         style={[
-          headers.animatedContainer,
+          styles.animatiedContainer,
           {transform: [{translateY: recentY}]},
         ]}>
-        <View style={headers.header}>
-          <Header />
-        </View>
+        <Text style={styles.title}>Discover Your Badminton Look</Text>
         <View style={styles.listCategory}>
           <ListCategory />
         </View>
-        <Animated.ScrollView
-          showsVerticalScrollIndicator={false}
-          onScroll={Animated.event(
-            [{nativeEvent: {contentOffset: {y: scrollY}}}],
-            {useNativeDriver: true},
-          )}>
-          <ListItems data={ListOfItems} />
-        </Animated.ScrollView>
       </Animated.View>
+      <Animated.ScrollView
+        showsVerticalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{nativeEvent: {contentOffset: {y: scrollY}}}],
+          {useNativeDriver: true},
+        )}
+        contentContainerStyle={{paddingTop: 200}}>
+        <View style={styles.containerItem}>
+          <ListItems data={ListOfItems} />
+          <ListItems data={ListOfItems} />
+        </View>
+      </Animated.ScrollView>
     </View>
   );
 }
-
-const Header = () => {
-  return <Text style={headers.title}>Discover Your Badminton Look</Text>;
-};
 
 const ListCategory = () => {
   const [selected, setSelected] = useState(1);
@@ -100,32 +98,22 @@ const ItemCategory = ({item, onPress, color}) => {
   );
 };
 
-const headers = StyleSheet.create({
-  animatedContainer: {},
-  header: {
-    margin: 7,
-  },
-  title: {
-    fontFamily: fontType['pps-Medium'],
-    fontSize: 42,
-    color: colors.black(),
-    textAlign: 'center',
-  },
-});
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white(),
   },
   top: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 70,
-    flexDirection: 'row',
-    gap: 14,
-    zIndex: 999,
     backgroundColor: colors.white(),
+    justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'absolute',
+    zIndex: 1000,
+    height: 70,
+    gap: 14,
+    top: 0,
+    right: 0,
+    left: 0,
   },
   search: {
     borderRadius: 7,
@@ -141,11 +129,29 @@ const styles = StyleSheet.create({
   },
   listCategory: {
     alignItems: 'center',
-    marginVertical: 21,
-  },
-  itemContainer: {
-    alignItems: 'center',
     paddingVertical: 14,
+    position:'relative'
+  },
+  title: {
+    fontFamily: fontType['pps-Medium'],
+    fontSize: 42,
+    color: colors.black(),
+    textAlign: 'center',
+  },
+  animatiedContainer: {
+    position: 'absolute',
+    backgroundColor: colors.white(),
+    zIndex: 999,
+    top: 69,
+    left: 0,
+    right: 0,
+    elevation: 1000,
+  },
+  containerItem: {
+    backgroundColor: colors.blue(0.5),
+    top: 55,
+    paddingTop:7,
+    paddingBottom:70
   },
 });
 
