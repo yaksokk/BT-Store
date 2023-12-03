@@ -19,9 +19,7 @@ const formatNumber = number => {
   return number.toString();
 };
 
-const Profile = ({route}) => {
-  const blogId = route.params
-  const data = ListOfItems.flatMap(item => item.data).find(blog => blog.id === blogId);
+const Profile = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -105,7 +103,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontFamily: fontType['Pjs-ExtraBold'],
+    fontFamily: fontType['pps-Bold'],
     color: colors.black(),
   },
 });

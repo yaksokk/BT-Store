@@ -1,7 +1,7 @@
-import React from 'react';
-import { fontType, colors } from '../theme';
-import {Home, Profile, BlogDetail, Wishlist} from '../screens';
-import Icon from 'react-native-vector-icons/FontAwesome5';
+import React from 'react'
+import { fontType, colors } from '../theme'
+import Icon from 'react-native-vector-icons/FontAwesome5'
+import {Home, Profile, BlogDetail, Wishlist} from '../screens'
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
 

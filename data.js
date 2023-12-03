@@ -41,7 +41,7 @@ export const ListOfItems = [
         totalLikes: 2001,
       },
       {
-        id: 4,
+        id: 2,
         merk: 'Li-Ning',
         category: 'Raket',
         name: 'Halbertec 8000',
@@ -54,7 +54,7 @@ export const ListOfItems = [
         totalLikes: 2001,
       },
       {
-        id: 7,
+        id: 3,
         merk: 'Victor',
         category: 'Raket',
         name: 'Thruster Falcon C LTD A Tai Tzu Ying',
@@ -74,7 +74,7 @@ export const ListOfItems = [
     horizontal: true,
     data: [
       {
-        id: 1,
+        id: 4,
         merk: 'Yonex',
         category: 'Raket',
         name: 'Astrox 99 Pro JPN',
@@ -88,7 +88,7 @@ export const ListOfItems = [
         totalLikes: 2001,
       },
       {
-        id: 2,
+        id: 5,
         merk: 'Yonex',
         category: 'Sepatu',
         name: 'Velo 100 Junior',
@@ -101,7 +101,7 @@ export const ListOfItems = [
         totalLikes: 2001,
       },
       {
-        id: 3,
+        id: 6,
         merk: 'Yonex',
         category: 'Baju',
         name: 'YONEX Men Round Neck Shirt RM-S092-2321-AW22-Sr',
@@ -120,7 +120,7 @@ export const ListOfItems = [
     horizontal: true,
     data: [
       {
-        id: 4,
+        id: 7,
         merk: 'Li-Ning',
         category: 'Raket',
         name: 'Halbertec 8000',
@@ -133,7 +133,7 @@ export const ListOfItems = [
         totalLikes: 2001,
       },
       {
-        id: 5,
+        id: 8,
         merk: 'Li-Ning',
         category: 'Sepatu',
         name: 'Ranger AYTS067-3 Nany',
@@ -146,7 +146,7 @@ export const ListOfItems = [
         totalLikes: 2001,
       },
       {
-        id: 6,
+        id: 9,
         merk: 'Li-Ning',
         category: 'Baju',
         name: 'Li-Ning Badminton T-Shirt ATSSC13-2 Red Thomas/Uber Cup Edition',
@@ -165,7 +165,7 @@ export const ListOfItems = [
     horizontal: true,
     data: [
       {
-        id: 7,
+        id: 10,
         merk: 'Victor',
         category: 'Raket',
         name: 'Thruster Falcon C LTD A Tai Tzu Ying',
@@ -178,7 +178,7 @@ export const ListOfItems = [
         totalLikes: 2001,
       },
       {
-        id: 8,
+        id: 11,
         merk: 'Victor',
         category: 'Sepatu',
         name: 'S 82 II',
@@ -191,7 +191,7 @@ export const ListOfItems = [
         totalLikes: 2001,
       },
       {
-        id: 9,
+        id: 12,
         merk: 'Victor',
         category: 'Baju',
         name: 'VICTOR T 20051 B Tai Tzu Ying Limited TTY Signature',
