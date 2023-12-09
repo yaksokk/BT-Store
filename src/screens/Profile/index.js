@@ -1,10 +1,17 @@
-import React from 'react';
-import {ItemSmall} from '../../components';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import { fontType, colors } from '../../theme';
-import FastImage from 'react-native-fast-image';
+import {useNavigation} from '@react-navigation/native';
 import {ProfileData, ListOfItems} from '../../../data';
-import {ScrollView, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import FastImage from 'react-native-fast-image';
+import {fontType, colors} from '../../theme';
+import {ItemSmall} from '../../components';
+import React from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+} from 'react-native';
 
 const formatNumber = number => {
   if (number >= 1000000000) {
@@ -20,10 +27,11 @@ const formatNumber = number => {
 };
 
 const Profile = () => {
+  const navigation = useNavigation();
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Icon name='cog' size={24} color={colors.black()} />
+        <Icon name="cog" size={24} color={colors.black()} />
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -70,7 +78,7 @@ const Profile = () => {
             <Text style={profile.buttonText}>Edit Profile</Text>
           </TouchableOpacity>
         </View>
-        <View style={{paddingVertical: 10, gap:10}}>
+        <View style={{paddingVertical: 10, gap: 10}}>
           {ListOfItems.slice(2).map((category, categoryIndex) => (
             <View key={categoryIndex}>
               <Text style={styles.categoryTitle}>{category.title}</Text>
@@ -81,6 +89,11 @@ const Profile = () => {
           ))}
         </View>
       </ScrollView>
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={() => navigation.navigate('AddBlog')}>
+        <Icon name="edit" size={24} color={colors.white()} />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -106,6 +119,23 @@ const styles = StyleSheet.create({
     fontFamily: fontType['pps-Bold'],
     color: colors.black(),
   },
+  floatingButton: {
+    backgroundColor: colors.blue(),
+    padding: 15,
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    borderRadius: 10,
+    shadowColor: colors.blue(),
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+
+    elevation: 8,
+  },
 });
 const profile = StyleSheet.create({
   pic: {width: 100, height: 100, borderRadius: 15},
@@ -113,7 +143,7 @@ const profile = StyleSheet.create({
     color: colors.black(),
     fontSize: 20,
     fontFamily: fontType['Pjs-Bold'],
-    textTransform:'capitalize'
+    textTransform: 'capitalize',
   },
   info: {
     fontSize: 12,

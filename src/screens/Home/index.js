@@ -1,20 +1,20 @@
-import {ListItems} from './../../components';
-import React, {useState, useRef} from 'react';
-import {fontType, colors} from './../../theme';
-import {CategoryList, ListOfItems} from '../../../data';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import {CategoryList, ListOfItems} from '../../../data';
+import {useNavigation} from '@react-navigation/native';
+import {fontType, colors} from './../../theme';
+import React, {useState, useRef} from 'react';
+import {ListItems} from './../../components';
 import {
   Animated,
   FlatList,
   StyleSheet,
   Text,
   View,
-  TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback
 } from 'react-native';
 
 export default function Home() {
-  const [text, onChangeText] = useState('Search');
   const scrollY = useRef(new Animated.Value(0)).current;
   const diffClampY = Animated.diffClamp(scrollY, 0, 142);
   const recentY = diffClampY.interpolate({
@@ -22,17 +22,18 @@ export default function Home() {
     outputRange: [0, -142],
     extrapolate: 'clamp',
   });
+
+  const navigation = useNavigation();
   return (
     <View style={styles.container}>
       <View style={[styles.top]}>
-        <View style={styles.search}>
-          <Icon name="search" size={24} color={colors.black()} />
-          <TextInput
-            style={styles.input}
-            onChangeText={onChangeText}
-            value={text}
-          />
-        </View>
+        <TouchableWithoutFeedback
+          onPress={() => navigation.navigate('SearchPage')}>
+          <View style={styles.search}>
+            <Icon name="search" size={24} color={colors.black()} />
+            <Text style={styles.placeholder}>Search</Text>
+          </View>
+        </TouchableWithoutFeedback>
         <View style={{flexDirection: 'row', gap: 7}}>
           <Icon name="heart" solid size={24} color={colors.black()} />
           <Icon name="shopping-cart" size={24} color={colors.black()} />
@@ -116,21 +117,25 @@ const styles = StyleSheet.create({
     left: 0,
   },
   search: {
-    borderRadius: 7,
-    width: '75%',
     backgroundColor: colors.grey(0.17),
-    paddingHorizontal: 7,
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
+    width: '75%',
+    borderRadius: 7,
+    padding: 10,
+    gap: 7,
   },
-  input: {
+  placeholder: {
     marginLeft: 7,
-    flexWrap: 'nowrap',
+    // flexWrap: 'nowrap',
+    fontFamily: fontType['pps-Medium'],
+    lineHeight: 21,
+    color: colors.black(0.7),
   },
   listCategory: {
     alignItems: 'center',
     paddingVertical: 14,
-    position:'relative'
+    position: 'relative',
   },
   title: {
     fontFamily: fontType['pps-Medium'],
@@ -146,12 +151,13 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     elevation: 1000,
+    borderRadius: 14,
   },
   containerItem: {
-    backgroundColor: colors.blue(0.5),
+    backgroundColor: colors.white(),
     top: 55,
-    paddingTop:7,
-    paddingBottom:70
+    paddingTop: 7,
+    paddingBottom: 70,
   },
 });
 

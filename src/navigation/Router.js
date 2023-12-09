@@ -1,9 +1,9 @@
-import React from 'react'
-import { fontType, colors } from '../theme'
-import Icon from 'react-native-vector-icons/FontAwesome5'
-import {Home, Profile, BlogDetail, Wishlist} from '../screens'
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
+import {Home, Profile, BlogDetail, Wishlist, Search, AddBlogForm} from '../screens';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import {fontType, colors} from '../theme';
+import React from 'react';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -30,9 +30,7 @@ function MainApp() {
         component={Home}
         options={{
           tabBarLabel: 'Home',
-          tabBarIcon: ({color}) => (
-            <Icon name='home'  size={17} color={color} />
-          ),
+          tabBarIcon: ({color}) => <Icon name="home" size={17} color={color} />,
           headerShown: false,
         }}
       />
@@ -41,9 +39,7 @@ function MainApp() {
         component={Wishlist}
         options={{
           tabBarLabel: 'Wishlist',
-          tabBarIcon: ({color}) => (
-            <Icon name='list'  size={17} color={color} />
-          ),
+          tabBarIcon: ({color}) => <Icon name="list" size={17} color={color} />,
           headerShown: false,
         }}
       />
@@ -52,9 +48,7 @@ function MainApp() {
         component={Profile}
         options={{
           tabBarLabel: 'Profile',
-          tabBarIcon: ({color}) => (
-            <Icon name='user'  size={17} color={color} />
-          ),
+          tabBarIcon: ({color}) => <Icon name="user" size={17} color={color} />,
           headerShown: false,
         }}
       />
@@ -73,7 +67,27 @@ const Router = () => {
         name="BlogDetail"
         component={BlogDetail}
         options={{
-          headerShown: false, 
+          headerShown: false,
+          animationEnabled: true,
+          animationTypeForReplace: 'pop',
+          gestureEnabled: true,
+          gestureDirection: 'horizontal',
+          ...TransitionPresets.SlideFromRightIOS,
+        }}
+      />
+      <Stack.Screen
+        name="SearchPage"
+        component={Search}
+        options={{
+          headerShown: false,
+          presentation: 'transparentModal',
+        }}
+      />
+      <Stack.Screen
+        name="AddBlog"
+        component={AddBlogForm}
+        options={{
+          headerShown: false,
           animationEnabled: true,
           animationTypeForReplace: 'pop',
           gestureEnabled: true,
