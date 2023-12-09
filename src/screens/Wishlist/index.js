@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
 },
 title: {
     fontSize: 28,
-    color: colors.black(.7),
+    color: colors.blue(),
     fontFamily: fontType['mts-Bold']
   },
 });
