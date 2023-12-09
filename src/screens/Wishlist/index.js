@@ -1,58 +1,43 @@
 import React from 'react';
-import {colors } from './../../theme';
+import {colors, fontType} from './../../theme';
 import {ListItems} from './../../components';
-import { ListOfItems } from '../../../data';
-import { StyleSheet,  Text, View,  ScrollView} from 'react-native'
+import {ListOfItems} from '../../../data';
+import {StyleSheet, Text, View, ScrollView} from 'react-native';
 
 export default function Wishlist() {
-    return (
-        <View style={styles.container}>
-            <Header/>
-            <ScrollView>
-                <View style={styles.itemContainer} >
-                    <ItemItem/>
-                </View>
-            </ScrollView>
+  return (
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Wishlist</Text>
         </View>
-    );
+        <View style={styles.itemContainer}>
+          <ListItems data={ListOfItems} />
+        </View>
+      </View>
+    </ScrollView>
+  );
 }
-
-const ItemItem = () => {
-    return(
-        <ScrollView horizontal={true} showsVerticalScrollIndicator={false}>
-            <ListItems data={ListOfItems}/>
-        </ScrollView>
-    )
-}
-
-const Header = () => {
-    <View style={header.container}>
-        <Text style={header.title}>Wishlist</Text>
-    </View>
-}
-
-const header = StyleSheet.create({
-    container:{
-        height:90,
-    },  
-    title:{
-        fontSize:21,
-        color:colors.black()
-    }
-})
 
 const styles = StyleSheet.create({
-    container: {
-        flex:1,
-        backgroundColor: colors.white(),
-    },
-    listCategory:{
-        alignItems:'center',
-        marginVertical:21,
-        
-    },
-    itemContainer:{
-        alignItems:'center',
-        paddingVertical:14,
-    }
-})
+  container: {
+    flex: 1,
+    backgroundColor: colors.white(),
+  },
+  itemContainer: {
+    alignItems: 'center',
+    paddingVertical: 14,
+  },
+  header:{
+    flex:1,
+    alignItems:'center',
+    paddingVertical:14,
+    borderBottomWidth:1.7,
+    borderColor: colors.blue(.7)
+},
+title: {
+    fontSize: 28,
+    color: colors.black(.7),
+    fontFamily: fontType['mts-Bold']
+  },
+});
