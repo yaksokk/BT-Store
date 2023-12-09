@@ -2,6 +2,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import {useNavigation} from '@react-navigation/native';
 import {fontType, colors} from '../../theme';
 import React, {useState} from 'react';
+import axios from 'axios';
 import {
   View,
   Text,
@@ -9,6 +10,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 
 const AddBlogForm = () => {
@@ -32,6 +34,36 @@ const AddBlogForm = () => {
   };
   const [image, setImage] = useState(null);
   const navigation = useNavigation();
+
+  const [loading, setLoading] = useState(false);
+
+  // fungsi untuk handle API
+  const handleUpload = async () => {
+    setLoading(true);
+    try {
+      await axios
+        .post('https://65641fc9ceac41c0761d7695.mockapi.io/wocoapp/blog', {
+          title: blogData.title,
+          category: blogData.category,
+          image,
+          content: blogData.content,
+          totalComments: blogData.totalComments,
+          totalLikes: blogData.totalLikes,
+          createdAt: new Date(),
+        })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      setLoading(false);
+      navigation.navigate('Profile');
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -113,10 +145,15 @@ const AddBlogForm = () => {
         </View>
       </ScrollView>
       <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.button} onPress={() => {}}>
+        <TouchableOpacity style={styles.button} onPress={handleUpload}>
           <Text style={styles.buttonLabel}>Upload</Text>
         </TouchableOpacity>
       </View>
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={colors.blue()} />
+        </View>
+      )}
     </View>
   );
 };
@@ -169,6 +206,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: fontType['pps-Medium'],
     color: colors.white(),
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.black(0.4),
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 const textInput = StyleSheet.create({
