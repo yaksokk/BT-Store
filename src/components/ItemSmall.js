@@ -1,15 +1,16 @@
-import React from 'react';
-import { fontType, colors } from '../theme';
-import FastImage from 'react-native-fast-image';
-import {useNavigation} from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import {Receipt21, Clock, Message} from 'iconsax-react-native';
 import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import {useNavigation} from '@react-navigation/native';
+import FastImage from 'react-native-fast-image';
+import {fontType, colors} from '../theme';
+import React from 'react';
 
 const ItemSmall = ({item}) => {
   const navigation = useNavigation();
   return (
-    <TouchableOpacity style={styles.cardItem} onPress={() => navigation.navigate('BlogDetail', {blogId: item.id})}>
+    <TouchableOpacity
+      style={styles.cardItem}
+      onPress={() => navigation.navigate('BlogDetail', {blogId: item.id})}>
       <FastImage
         style={styles.cardImage}
         source={{
@@ -23,22 +24,18 @@ const ItemSmall = ({item}) => {
         <View
           style={{
             flexDirection: 'row',
-            gap:30
+            gap: 30,
           }}>
-          <View style={{gap: 5, flex:1}}>
+          <View style={{gap: 5, flex: 1}}>
             <Text style={styles.cardCategory}>{item.category}</Text>
             <Text style={styles.cardTitle}>{item.name}</Text>
           </View>
-          <Receipt21
-            color={colors.grey(0.6)}
-            variant="Linear"
-            size={20}
-          />
+          <Icon name="bookmark" size={20} color={colors.grey(0.7)} />
         </View>
         <View style={styles.cardInfo}>
-          <Icon name='thumbs-up' size={10} color={colors.grey(0.7)} />
-          <Text style={styles.cardText}>{item.totalLikes}</Text>
-          <Icon name='comment-dots' size={10} color={colors.grey(0.7)} />
+          <Icon name="clock" size={10} color={colors.grey(0.7)} />
+          <Text style={styles.cardText}>{item.createdAt}</Text>
+          <Icon name="comment-dots" size={10} color={colors.grey(0.7)} />
           <Text style={styles.cardText}>{item.totalComments}</Text>
         </View>
       </View>
