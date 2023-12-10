@@ -1,10 +1,12 @@
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {useNavigation} from '@react-navigation/native';
+import {formatNumber} from '../../utils/formatNumber';
 import {ProfileData, ListOfItems} from '../../../data';
+import React, {useState, useCallback} from 'react';
 import FastImage from 'react-native-fast-image';
 import {fontType, colors} from '../../theme';
 import {ItemSmall} from '../../components';
-import React from 'react';
+import axios from 'axios';
 import {
   ScrollView,
   StyleSheet,
@@ -12,26 +14,44 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
-
-const formatNumber = number => {
-  if (number >= 1000000000) {
-    return (number / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
-  }
-  if (number >= 1000000) {
-    return (number / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
-  }
-  if (number >= 1000) {
-    return (number / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
-  }
-  return number.toString();
-};
+import {RefreshControl} from 'react-native-gesture-handler';
 
 const Profile = () => {
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(true);
+  const [blogData, setBlogData] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const getDataBlog = async () => {
+    try {
+      const response = await axios.get(
+        'https://65641fc9ceac41c0761d7695.mockapi.io/wocoapp/blog',
+      );
+      setBlogData(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      getDataBlog();
+      setRefreshing(false);
+    }, 1500);
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getDataBlog();
+    }, []),
+  );
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Icon name="cog" size={24} color={colors.black()} />
+        <TouchableOpacity>
+          <Icon name="cog" size={24} color={colors.black()} />
+        </TouchableOpacity>
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -39,7 +59,10 @@ const Profile = () => {
           paddingHorizontal: 24,
           gap: 10,
           paddingVertical: 20,
-        }}>
+        }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         <View style={{gap: 15, alignItems: 'center'}}>
           <FastImage
             style={profile.pic}
@@ -79,13 +102,8 @@ const Profile = () => {
           </TouchableOpacity>
         </View>
         <View style={{paddingVertical: 10, gap: 10}}>
-          {ListOfItems.slice(2).map((category, categoryIndex) => (
-            <View key={categoryIndex}>
-              <Text style={styles.categoryTitle}>{category.title}</Text>
-              {category.data.map((item, index) => (
-                <ItemSmall item={item} key={index} />
-              ))}
-            </View>
+          {ListOfItems.map((item, index) => (
+            <ItemSmall item={item} key={index} />
           ))}
         </View>
       </ScrollView>

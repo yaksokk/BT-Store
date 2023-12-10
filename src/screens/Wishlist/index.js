@@ -1,8 +1,8 @@
-import React from 'react';
+import {StyleSheet, Text, View, ScrollView} from 'react-native';
 import {colors, fontType} from './../../theme';
 import {ListItems} from './../../components';
 import {ListOfItems} from '../../../data';
-import {StyleSheet, Text, View, ScrollView} from 'react-native';
+import React from 'react';
 
 export default function Wishlist() {
   return (
@@ -12,7 +12,7 @@ export default function Wishlist() {
           <Text style={styles.title}>Wishlist</Text>
         </View>
         <View style={styles.itemContainer}>
-          <ListItems data={ListOfItems} />
+          <ListItems data={ListOfItems} numColumns={2} />
         </View>
       </View>
     </ScrollView>

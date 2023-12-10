@@ -33,16 +33,14 @@ const ContainerItem = ({item, onPress}) => {
           <Text style={listItems.cardTitle}>{item.name}</Text>
           <Text style={listItems.cardText}>{item.price}</Text>
         </View>
-        <View style={listItems.cardIcon}>
-          <TouchableOpacity onPress={onPress}>
-            <Icon name="heart" size={21} color={colors.black()} />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity style={listItems.cardIcon} onPress={onPress}>
+          <Icon name="heart" size={21} color={colors.black()} />
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
 };
-const ListItems = ({}) => {
+const ListItems = ({data, numColumns}) => {
   const [bookmark, setBookmark] = useState([]);
   const toggleBookmark = itemId => {
     if (bookmark.includes(itemId)) {
@@ -51,87 +49,67 @@ const ListItems = ({}) => {
       setBookmark([...bookmark, itemId]);
     }
   };
+  const renderItem = ({item}) => {
+    variant = bookmark.includes(item.id) ? 'Bold' : 'Linear';
+    return (
+      <ContainerItem
+        item={item}
+        variant={variant}
+        onPress={() => toggleBookmark(item.id)}
+      />
+    );
+  };
   return (
-    <View>
-      <SafeAreaView style={{flex: 1}}>
-        <SectionList
-          contentContainerStyle={{paddingHorizontal: 10}}
-          stickySectionHeaderEnabled={false}
-          sections={ListOfItems}
-          renderSectionHeader={({section}) => (
-            <>
-              <Text style={listItems.titleItem}>{section.title}</Text>
-              {section.horizontal ? (
-                <FlatList
-                  horizontal
-                  data={section.data}
-                  renderItem={({item}) => <ContainerItem item={item} />}
-                  showsHorizontalScrollIndicator={false}
-                />
-              ) : null}
-            </>
-          )}
-          renderItem={({item, section}) => {
-            if (section.horizontal) {
-              return null;
-            }
-            return (
-              <ContainerItem
-                item={item}
-                onPress={() => toggleBookmark(item.id)}
-              />
-            );
-          }}
-        />
-      </SafeAreaView>
-    </View>
+    <FlatList
+      data={data}
+      keyExtractor={item => item.id}
+      renderItem={item => renderItem({...item})}
+      showsHorizontalScrollIndicator={false}
+      numColumns={numColumns}
+      ItemSeparatorComponent={() => <View style={{width: 15}} />}
+    />
   );
 };
 export default ListItems;
 
 const listItems = StyleSheet.create({
-  titleItem: {
-    fontSize: 17,
-    color: colors.blue(0.7),
-    fontFamily: fontType['pps-Medium'],
-  },
   cardItem: {
-    width: 170,
-    alignItems: 'center',
     backgroundColor: colors.black(0.09),
-    borderRadius: 7,
-    marginHorizontal: 7,
-    marginVertical: 14,
     position: 'relative',
+    alignItems: 'center',
+    marginHorizontal: 14,
+    marginVertical: 14,
     paddingBottom: 7,
+    borderRadius: 7,
+    width: 170,
   },
   cardImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 15,
     marginVertical: 14,
+    borderRadius: 15,
+    height: 100,
+    width: 100,
   },
   cardContent: {
     flexDirection: 'row',
     maxWidth: '100%',
   },
   cardInfo: {
-    width: '75%',
     paddingHorizontal: 7,
+    width: '75%',
   },
   cardTitle: {
     fontFamily: fontType['pps-Regular'],
-    fontSize: 14,
     color: colors.black(),
     flexWrap: 'wrap',
+    fontSize: 14,
   },
   cardText: {
-    fontSize: 10,
     color: colors.black(),
     fontFamily: fontType['pps-Regular'],
+    fontSize: 10,
   },
   cardIcon: {
-    width: '23%',
     alignItems: 'center',
+    width: '23%',
   },
 });

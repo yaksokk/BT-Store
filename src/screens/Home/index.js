@@ -11,7 +11,7 @@ import {
   Text,
   View,
   TouchableOpacity,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from 'react-native';
 
 export default function Home() {
@@ -35,8 +35,12 @@ export default function Home() {
           </View>
         </TouchableWithoutFeedback>
         <View style={{flexDirection: 'row', gap: 7}}>
-          <Icon name="heart" solid size={24} color={colors.black()} />
-          <Icon name="shopping-cart" size={24} color={colors.black()} />
+          <TouchableOpacity>
+            <Icon name="heart" solid size={24} color={colors.black()} />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Icon name="shopping-cart" size={24} color={colors.black()} />
+          </TouchableOpacity>
         </View>
       </View>
       <Animated.View
@@ -57,8 +61,7 @@ export default function Home() {
         )}
         contentContainerStyle={{paddingTop: 200}}>
         <View style={styles.containerItem}>
-          <ListItems data={ListOfItems} />
-          <ListItems data={ListOfItems} />
+          <ListItems data={ListOfItems} numColumns={2} />
         </View>
       </Animated.ScrollView>
     </View>
@@ -112,29 +115,29 @@ const styles = StyleSheet.create({
     zIndex: 1000,
     height: 70,
     gap: 14,
-    top: 0,
     right: 0,
     left: 0,
+    top: 0,
   },
   search: {
     backgroundColor: colors.grey(0.17),
     alignItems: 'center',
     flexDirection: 'row',
-    width: '75%',
     borderRadius: 7,
+    width: '75%',
     padding: 10,
     gap: 7,
   },
   placeholder: {
     marginLeft: 7,
-    // flexWrap: 'nowrap',
     fontFamily: fontType['pps-Medium'],
+
     lineHeight: 21,
     color: colors.black(0.7),
   },
   listCategory: {
     alignItems: 'center',
-    paddingVertical: 14,
+    paddingVertical: 21,
     position: 'relative',
   },
   title: {
@@ -146,32 +149,32 @@ const styles = StyleSheet.create({
   animatiedContainer: {
     position: 'absolute',
     backgroundColor: colors.white(),
-    zIndex: 999,
-    top: 69,
-    left: 0,
-    right: 0,
-    elevation: 1000,
     borderRadius: 14,
+    elevation: 1000,
+    zIndex: 999,
+    right: 0,
+    left: 0,
+    top: 69,
   },
   containerItem: {
     backgroundColor: colors.white(),
-    top: 55,
-    paddingTop: 7,
     paddingBottom: 70,
+    paddingTop: 14,
+    top: 55,
   },
 });
 
 const category = StyleSheet.create({
   item: {
+    backgroundColor: colors.grey(0.08),
+    alignItems: 'center',
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 25,
-    alignItems: 'center',
-    backgroundColor: colors.grey(0.08),
   },
   title: {
     fontFamily: fontType['pps-Medium'],
-    fontSize: 14,
     lineHeight: 18,
+    fontSize: 14,
   },
 });

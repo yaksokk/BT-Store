@@ -1,6 +1,7 @@
 import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {useNavigation} from '@react-navigation/native';
+import { formatDate } from '../utils/formatDate';
 import FastImage from 'react-native-fast-image';
 import {fontType, colors} from '../theme';
 import React from 'react';
@@ -27,16 +28,16 @@ const ItemSmall = ({item}) => {
             gap: 30,
           }}>
           <View style={{gap: 5, flex: 1}}>
-            <Text style={styles.cardCategory}>{item.category}</Text>
-            <Text style={styles.cardTitle}>{item.name}</Text>
+            <Text style={styles.cardCategory}>{item.category?.name}</Text>
+            <Text style={styles.cardTitle}>{item?.name}</Text>
           </View>
           <Icon name="bookmark" size={20} color={colors.grey(0.7)} />
         </View>
         <View style={styles.cardInfo}>
           <Icon name="clock" size={10} color={colors.grey(0.7)} />
-          <Text style={styles.cardText}>{item.createdAt}</Text>
+          <Text style={styles.cardText}>{formatDate(item?.createdAt)}</Text>
           <Icon name="comment-dots" size={10} color={colors.grey(0.7)} />
-          <Text style={styles.cardText}>{item.totalComments}</Text>
+          <Text style={styles.cardText}>{item?.totalComments}</Text>
         </View>
       </View>
     </TouchableOpacity>

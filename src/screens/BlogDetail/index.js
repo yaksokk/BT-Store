@@ -1,23 +1,11 @@
+import {Animated, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import {formatNumber} from '../../utils/formatNumber';
+import {useNavigation} from '@react-navigation/native';
+import FastImage from 'react-native-fast-image';
+import {fontType, colors} from '../../theme';
 import React, {useState, useRef} from 'react';
 import {ListOfItems} from '../../../data';
-import { fontType, colors } from '../../theme';
-import FastImage from 'react-native-fast-image';
-import {useNavigation} from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import {Animated, StyleSheet, Text, View, ScrollView, TouchableOpacity} from 'react-native';
-
-const formatNumber = number => {
-  if (number >= 1000000000) {
-    return (number / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
-  }
-  if (number >= 1000000) {
-    return (number / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
-  }
-  if (number >= 1000) {
-    return (number / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
-  }
-  return number.toString();
-};
 
 const BlogDetail = ({route}) => {
   const {blogId} = route.params;
@@ -25,8 +13,8 @@ const BlogDetail = ({route}) => {
     liked: {variant: 'Linear', color: colors.grey(0.6)},
     bookmarked: {variant: 'Linear', color: colors.grey(0.6)},
   });
-  const selectedBlog = ListOfItems.flatMap(item => item.data).find(blog => blog.id === blogId);
-  const navigation = useNavigation();
+  const selectedBlog = ListOfItems.find(blog => blog.id === blogId)
+  const navigation = useNavigation()
   const toggleIcon = iconName => {
     setIconStates(prevStates => ({
       ...prevStates,
@@ -40,28 +28,28 @@ const BlogDetail = ({route}) => {
     }));
   };
 
-    // Buat Animation
-    const scrollY = useRef(new Animated.Value(0)).current;
-    const diffClampY = Animated.diffClamp(scrollY, 0, 52);
-    const headerY = diffClampY.interpolate({
-      inputRange: [0, 52],
-      outputRange: [0, -52],
-    });
-    const bottomBarY = diffClampY.interpolate({
-      inputRange: [0, 52],
-      outputRange: [0, 52],
-    });
-
+  // Buat Animation
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const diffClampY = Animated.diffClamp(scrollY, 0, 52);
+  const headerY = diffClampY.interpolate({
+    inputRange: [0, 52],
+    outputRange: [0, -52],
+  });
+  const bottomBarY = diffClampY.interpolate({
+    inputRange: [0, 52],
+    outputRange: [0, 52],
+  });
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.header, {transform: [{translateY: headerY}]}]}>
+      <Animated.View
+        style={[styles.header, {transform: [{translateY: headerY}]}]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name='arrow-left' size={24} color={colors.grey(0.7)} />
+          <Icon name="arrow-left" size={24} color={colors.grey(0.7)} />
         </TouchableOpacity>
         <View style={{flexDirection: 'row', justifyContent: 'center', gap: 20}}>
-          <Icon name='share' size={24} color={colors.grey(0.7)} />
-          <Icon name='ellipsis-v' size={24} color={colors.grey(0.7)} />
+          <Icon name="share" size={24} color={colors.grey(0.7)} />
+          <Icon name="ellipsis-v" size={24} color={colors.grey(0.7)} />
         </View>
       </Animated.View>
       <Animated.ScrollView
@@ -82,8 +70,7 @@ const BlogDetail = ({route}) => {
             headers: {Authorization: 'someAuthToken'},
             priority: FastImage.priority.high,
           }}
-          resizeMode={FastImage.resizeMode.cover}>
-        </FastImage>
+          resizeMode={FastImage.resizeMode.cover}></FastImage>
         <View
           style={{
             flexDirection: 'row',
@@ -96,24 +83,24 @@ const BlogDetail = ({route}) => {
         <Text style={styles.name}>{selectedBlog.name}</Text>
         <Text style={styles.content}>{selectedBlog.content}</Text>
       </Animated.ScrollView>
-      <Animated.View 
+      <Animated.View
         style={[styles.bottomBar, {transform: [{translateY: bottomBarY}]}]}>
-        <View style={{flexDirection:'row', gap:5, alignItems:'center'}}>
+        <View style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>
           <TouchableOpacity onPress={() => toggleIcon('liked')}>
-          <Icon name='thumbs-up' size={24} color={iconStates.liked.color} />
+            <Icon name="thumbs-up" size={24} color={iconStates.liked.color} />
           </TouchableOpacity>
           <Text style={styles.info}>
             {formatNumber(selectedBlog.totalLikes)}
           </Text>
         </View>
-        <View style={{flexDirection:'row', gap:5, alignItems:'center'}}>
-        <Icon name='comment-dots' size={24} color={colors.grey(0.7)} />
-        <Text style={styles.info}>
-          {formatNumber(selectedBlog.totalComments)}
-        </Text>
+        <View style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>
+          <Icon name="comment-dots" size={24} color={colors.grey(0.7)} />
+          <Text style={styles.info}>
+            {formatNumber(selectedBlog.totalComments)}
+          </Text>
         </View>
         <TouchableOpacity onPress={() => toggleIcon('bookmarked')}>
-        <Icon name='list-alt' size={24} color={iconStates.bookmarked.color} />
+          <Icon name="list-alt" size={24} color={iconStates.bookmarked.color} />
         </TouchableOpacity>
       </Animated.View>
     </View>
