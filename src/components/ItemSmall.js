@@ -29,7 +29,8 @@ const ItemSmall = ({item}) => {
           }}>
           <View style={{gap: 5, flex: 1}}>
             <Text style={styles.cardCategory}>{item.category?.name}</Text>
-            <Text style={styles.cardTitle}>{item?.name}</Text>
+            <Text style={styles.cardTitle}>{item?.title}</Text>
+            <Text style={styles.cardPrice}>{item?.price}</Text>
           </View>
           <Icon name="bookmark" size={20} color={colors.grey(0.7)} />
         </View>
@@ -89,5 +90,10 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     flex: 1,
     paddingVertical: 10,
+  },
+  cardPrice:{
+    color: colors.grey(.7),
+    fontFamily: fontType['pps-Regular'],
+    fontSize:12,
   },
 });

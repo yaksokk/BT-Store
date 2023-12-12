@@ -1,117 +1,84 @@
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {formatNumber} from '../../utils/formatNumber';
-import {ProfileData, ListOfItems} from '../../../data';
 import React, {useState, useCallback} from 'react';
 import FastImage from 'react-native-fast-image';
 import {fontType, colors} from '../../theme';
-import {ItemSmall} from '../../components';
+import {ProfileData} from '../../../data';
 import axios from 'axios';
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-} from 'react-native';
-import {RefreshControl} from 'react-native-gesture-handler';
+import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 
 const Profile = () => {
-  const navigation = useNavigation();
-  const [loading, setLoading] = useState(true);
-  const [blogData, setBlogData] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const getDataBlog = async () => {
-    try {
-      const response = await axios.get(
-        'https://65641fc9ceac41c0761d7695.mockapi.io/wocoapp/blog',
-      );
-      setBlogData(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      getDataBlog();
-      setRefreshing(false);
-    }, 1500);
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      getDataBlog();
-    }, []),
-  );
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity>
-          <Icon name="cog" size={24} color={colors.black()} />
-        </TouchableOpacity>
-      </View>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingHorizontal: 24,
+      <View style={styles.header}></View>
+      <View
+        style={{
+          height: '100%',
           gap: 10,
-          paddingVertical: 20,
-        }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }>
-        <View style={{gap: 15, alignItems: 'center'}}>
-          <FastImage
-            style={profile.pic}
-            source={{
-              uri: ProfileData.profilePict,
-              headers: {Authorization: 'someAuthToken'},
-              priority: FastImage.priority.high,
-            }}
-            resizeMode={FastImage.resizeMode.cover}
-          />
-          <View style={{gap: 5, alignItems: 'center'}}>
-            <Text style={profile.name}>{ProfileData.name}</Text>
-            <Text style={profile.info}>
-              Member since {ProfileData.createdAt}
+          alignItems: 'center',
+          paddingHorizontal:21,
+          top:70
+
+        }}>
+        <FastImage
+          style={profile.pic}
+          source={{
+            uri: ProfileData.profilePict,
+            headers: {Authorization: 'someAuthToken'},
+            priority: FastImage.priority.high,
+          }}
+          resizeMode={FastImage.resizeMode.cover}
+        />
+        <View style={{gap: 5, alignItems: 'center'}}>
+          <Text style={profile.name}>{ProfileData.name}</Text>
+        </View>
+        <View style={{flexDirection: 'row', gap: 20}}>
+          <View style={{alignItems: 'center', gap: 5}}>
+            <Text style={profile.sum}>{ProfileData.blogPosted}</Text>
+            <Text style={profile.tag}>Product</Text>
+          </View>
+          <View style={{alignItems: 'center', gap: 5}}>
+            <Text style={profile.sum}>
+              {formatNumber(ProfileData.following)}
             </Text>
+            <Text style={profile.tag}>Following</Text>
           </View>
-          <View style={{flexDirection: 'row', gap: 20}}>
-            <View style={{alignItems: 'center', gap: 5}}>
-              <Text style={profile.sum}>{ProfileData.blogPosted}</Text>
-              <Text style={profile.tag}>Posted</Text>
-            </View>
-            <View style={{alignItems: 'center', gap: 5}}>
-              <Text style={profile.sum}>
-                {formatNumber(ProfileData.following)}
-              </Text>
-              <Text style={profile.tag}>Following</Text>
-            </View>
-            <View style={{alignItems: 'center', gap: 5}}>
-              <Text style={profile.sum}>
-                {formatNumber(ProfileData.follower)}
-              </Text>
-              <Text style={profile.tag}>Follower</Text>
-            </View>
+          <View style={{alignItems: 'center', gap: 5}}>
+            <Text style={profile.sum}>
+              {formatNumber(ProfileData.follower)}
+            </Text>
+            <Text style={profile.tag}>Follower</Text>
           </View>
-          <TouchableOpacity style={profile.buttonEdit}>
-            <Text style={profile.buttonText}>Edit Profile</Text>
+        </View>
+        <View style={styles.wrapper}>
+          <TouchableOpacity style={styles.button}>
+            <Icon name="thumbs-up" solid size={17} color={colors.black()} />
+            <Text style={styles.title}>Rating</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Icon name="info-circle" size={17} color={colors.black()} />
+            <Text style={styles.title}>About</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Icon name="cog" size={17} color={colors.black()} />
+            <Text style={styles.title}>Settings</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Icon
+              name="question-circle"
+              solid
+              size={17}
+              color={colors.black()}
+            />
+            <Text style={styles.title}>Help & FAQ</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Icon name="sign-out-alt" size={17} color={colors.black()} />
+            <Text style={styles.title}>Log Out</Text>
           </TouchableOpacity>
         </View>
-        <View style={{paddingVertical: 10, gap: 10}}>
-          {ListOfItems.map((item, index) => (
-            <ItemSmall item={item} key={index} />
-          ))}
-        </View>
-      </ScrollView>
-      <TouchableOpacity
-        style={styles.floatingButton}
-        onPress={() => navigation.navigate('AddBlog')}>
-        <Icon name="edit" size={24} color={colors.white()} />
-      </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -120,73 +87,71 @@ export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white(),
   },
   header: {
-    paddingHorizontal: 24,
-    justifyContent: 'flex-end',
-    flexDirection: 'row',
+    backgroundColor: colors.blue(.9),
+    position:'absolute',
+    height: 125,
+    top:0,
+    left:0,
+    right:0,
+  },
+  borders: {
+    borderColor: colors.black(0.7),
+    alignItems: 'flex-start',
+    position: 'relative',
+    paddingHorizontal: 7,
+    paddingVertical: 7,
+    borderRadius: 7,
+    borderWidth: 1,
+    width: '100%',
+    gap: 7,
+  },
+  button: {
     alignItems: 'center',
-    height: 52,
-    elevation: 8,
-    paddingTop: 8,
-    paddingBottom: 4,
+    flexDirection: 'row',
+    width: '100%',
+    gap: 7,
   },
   title: {
-    fontSize: 20,
-    fontFamily: fontType['pps-Bold'],
-    color: colors.black(),
+    fontFamily: fontType['pps-Medium'],
+    color: colors.black(0.7),
+    fontSize: 17,
   },
-  floatingButton: {
-    backgroundColor: colors.blue(),
-    padding: 15,
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    borderRadius: 10,
-    shadowColor: colors.blue(),
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
-
-    elevation: 8,
+  wrapper: {
+    backgroundColor: colors.black(0.07),
+    paddingHorizontal: 14,
+    alignItems: 'center',
+    paddingVertical: 14,
+    borderRadius: 14,
+    marginTop: 28,
+    width: '100%',
+    gap: 14,
   },
 });
+
 const profile = StyleSheet.create({
-  pic: {width: 100, height: 100, borderRadius: 15},
+  pic: {
+    borderColor: colors.black(0.4),
+    borderRadius: 100,
+    borderWidth: 2,
+    height: 100,
+    width: 100,
+  },
   name: {
+    fontFamily: fontType['pps-Medium'],
+    textTransform: 'capitalize',
     color: colors.black(),
     fontSize: 20,
-    fontFamily: fontType['Pjs-Bold'],
-    textTransform: 'capitalize',
-  },
-  info: {
-    fontSize: 12,
-    fontFamily: fontType['Pjs-Regular'],
-    color: colors.grey(),
   },
   sum: {
-    fontSize: 16,
-    fontFamily: fontType['Pjs-SemiBold'],
+    fontFamily: fontType['pps-Medium'],
     color: colors.black(),
+    fontSize: 16,
   },
   tag: {
-    fontSize: 14,
-    fontFamily: fontType['Pjs-Regular'],
+    fontFamily: fontType['pps-Regular'],
     color: colors.grey(0.5),
-  },
-  buttonEdit: {
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    backgroundColor: colors.grey(0.1),
-    borderRadius: 10,
-  },
-  buttonText: {
     fontSize: 14,
-    fontFamily: fontType['Pjs-SemiBold'],
-    color: colors.black(),
   },
 });

@@ -1,10 +1,18 @@
 import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
-import {Home, Profile, BlogDetail, Wishlist, Search, AddBlogForm} from '../screens';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {fontType, colors} from '../theme';
 import React from 'react';
-
+import {
+  Home,
+  Profile,
+  BlogDetail,
+  Wishlist,
+  Search,
+  AddBlogForm,
+  EditBlogForm,
+  Product
+} from '../screens';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 function MainApp() {
@@ -40,6 +48,15 @@ function MainApp() {
         options={{
           tabBarLabel: 'Wishlist',
           tabBarIcon: ({color}) => <Icon name="list" size={17} color={color} />,
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen
+        name="Product"
+        component={Product}
+        options={{
+          tabBarLabel: 'Product',
+          tabBarIcon: ({color}) => <Icon name="product-hunt" size={17} color={color} />,
           headerShown: false,
         }}
       />
@@ -91,7 +108,19 @@ const Router = () => {
           animationEnabled: true,
           animationTypeForReplace: 'pop',
           gestureEnabled: true,
-          gestureDirection : 'horizontal',
+          gestureDirection: 'horizontal',
+          ...TransitionPresets.SlideFromRightIOS,
+        }}
+      />
+      <Stack.Screen
+        name="EditBlog"
+        component={EditBlogForm}
+        options={{
+          headerShown: false,
+          animationEnabled: true,
+          animationTypeForReplace: 'pop',
+          gestureEnabled: true,
+          gestureDirection: 'horizontal',
           ...TransitionPresets.SlideFromRightIOS,
         }}
       />
