@@ -4,7 +4,6 @@ import React, {useState, useRef, useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {formatNumber} from '../../utils/formatNumber';
 import ActionSheet from 'react-native-actions-sheet';
-import { formatDate } from '../../utils/formatDate';
 import FastImage from 'react-native-fast-image';
 import {fontType, colors} from '../../theme';
 import axios from 'axios';
@@ -138,7 +137,7 @@ const BlogDetail = ({route}) => {
             <Text style={styles.category}>{selectedBlog?.category.name}</Text>
             <Text style={styles.price}>{selectedBlog?.price}</Text>
           </View>
-          <Text style={styles.name}>{selectedBlog?.name}</Text>
+          <Text style={styles.title}>{selectedBlog?.title}</Text>
           <Text style={styles.content}>{selectedBlog?.content}</Text>
         </Animated.ScrollView>
       )}
@@ -278,7 +277,7 @@ const styles = StyleSheet.create({
     fontFamily: fontType['pps-Medium'],
     fontSize: 10,
   },
-  name: {
+  title: {
     fontSize: 17,
     fontFamily: fontType['pps-Medium'],
     color: colors.black(),
