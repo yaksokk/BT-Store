@@ -1,8 +1,11 @@
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import ImagePicker from 'react-native-image-crop-picker';
+import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
+import storage from '@react-native-firebase/storage';
 import React, {useEffect, useState} from 'react';
 import {fontType, colors} from '../../theme';
-import axios from 'axios';
+import FastImage from 'react-native-fast-image';
 import {
   View,
   Text,
@@ -23,6 +26,7 @@ const EditBlogForm = ({route}) => {
   const [blogData, setBlogData] = useState({
     title: '',
     content: '',
+    price:'',
     category: {},
     totalLikes: 0,
     totalComments: 0,
@@ -34,56 +38,82 @@ const EditBlogForm = ({route}) => {
     });
   };
   const [image, setImage] = useState(null);
+  const [oldImage, setOldImage] = useState(null);
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    getBlogById();
+    const subscriber = firestore()
+      .collection('blog')
+      .doc(blogId)
+      .onSnapshot(documentSnapshot => {
+        const blogData = documentSnapshot.data();
+        if (blogData) {
+          console.log('Blog data: ', blogData);
+          setBlogData({
+            title: blogData.title,
+            content: blogData.content,
+            price: blogData.price,
+            category: {
+              id: blogData.category.id,
+              name: blogData.category.name,
+            },
+          });
+          setOldImage(blogData.image);
+          setImage(blogData.image);
+          setLoading(false);
+        } else {
+          console.log(`Blog with ID ${blogId} not found.`);
+        }
+      });
+    setLoading(false);
+    return () => subscriber();
   }, [blogId]);
 
-  const getBlogById = async () => {
-    try {
-      const response = await axios.get(
-        `https://65641fc9ceac41c0761d7695.mockapi.io/wocoapp/blog/${blogId}`,
-      );
-      setBlogData({
-        title: response.data.title,
-        content: response.data.content,
-        category: {
-          id: response.data.category.id,
-          name: response.data.category.name,
-        },
+  const handleImagePick = async () => {
+    ImagePicker.openPicker({
+      width: 1920,
+      // height: 1080,
+      height: 1920,
+      cropping: true,
+    })
+      .then(image => {
+        console.log(image);
+        setImage(image.path);
+      })
+      .catch(error => {
+        console.log(error);
       });
-      setImage(response.data.image);
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-    }
   };
+
   const handleUpdate = async () => {
     setLoading(true);
+    let filename = image.substring(image.lastIndexOf('/') + 1);
+    const extension = filename.split('.').pop();
+    const name = filename.split('.').slice(0, -1).join('.');
+    filename = name + Date.now() + '.' + extension;
+    const reference = storage().ref(`blogimages/${filename}`);
     try {
-      await axios
-        .put(
-          `https://65641fc9ceac41c0761d7695.mockapi.io/wocoapp/blog/${blogId}`,
-          {
-            title: blogData.title,
-            category: blogData.category,
-            image,
-            content: blogData.content,
-            totalComments: blogData.totalComments,
-            totalLikes: blogData.totalLikes,
-          },
-        )
-        .then(function (response) {
-          console.log(response);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+      if (image !== oldImage && oldImage) {
+        const oldImageRef = storage().refFromURL(oldImage);
+        await oldImageRef.delete();
+      }
+      if (image !== oldImage) {
+        await reference.putFile(image);
+      }
+      const url =
+        image !== oldImage ? await reference.getDownloadURL() : oldImage;
+      await firestore().collection('blog').doc(blogId).update({
+        title: blogData.title,
+        category: blogData.category,
+        price: blogData.price,
+        image: url,
+        content: blogData.content,
+      });
       setLoading(false);
-      navigation.navigate('Profile');
-    } catch (e) {
-      console.log(e);
+      console.log('Blog Updated!');
+      navigation.navigate('BlogDetail', {blogId});
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -123,13 +153,14 @@ const EditBlogForm = ({route}) => {
             style={textInput.content}
           />
         </View>
-        <View style={[textInput.borderDashed]}>
+        <View style={[textInput.borderDashed, {minHeight: 250}]}>
           <TextInput
-            placeholder="Image"
-            value={image}
-            onChangeText={text => setImage(text)}
+            placeholder="Price"
+            value={blogData.price}
+            onChangeText={text => handleChange('content', text)}
             placeholderTextColor={colors.grey(0.6)}
-            style={textInput.content}
+            multiline
+            style={textInput.price}
           />
         </View>
         <View style={[textInput.borderDashed]}>
@@ -166,6 +197,58 @@ const EditBlogForm = ({route}) => {
             })}
           </View>
         </View>
+        {image ? (
+          <View style={{position: 'relative'}}>
+            <FastImage
+              style={{width: '100%', height: 127, borderRadius: 5}}
+              source={{
+                uri: image,
+                headers: {Authorization: 'someAuthToken'},
+                priority: FastImage.priority.high,
+              }}
+              resizeMode={FastImage.resizeMode.cover}
+            />
+            <TouchableOpacity
+              style={{
+                position: 'absolute',
+                top: -5,
+                right: -5,
+                backgroundColor: colors.blue(),
+                borderRadius: 25,
+              }}
+              onPress={() => setImage(null)}>
+              <Icon
+              name='plus'
+                size={20}
+                color={colors.white()}
+                style={{transform: [{rotate: '45deg'}]}}
+              />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity onPress={handleImagePick}>
+            <View
+              style={[
+                textInput.borderDashed,
+                {
+                  gap: 10,
+                  paddingVertical: 30,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                },
+              ]}>
+              <Icon name='plus' color={colors.grey(0.6)} size={42} />
+              <Text
+                style={{
+                  fontFamily: fontType['Pjs-Regular'],
+                  fontSize: 12,
+                  color: colors.grey(0.6),
+                }}>
+                Upload Thumbnail
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
       </ScrollView>
       <View style={styles.bottomBar}>
         <TouchableOpacity style={styles.button} onPress={handleUpdate}>
@@ -198,7 +281,7 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   title: {
-    fontFamily: fontType['Pjs-Bold'],
+    fontFamily: fontType['pps-Bold'],
     fontSize: 16,
     color: colors.black(),
   },
@@ -227,7 +310,7 @@ const styles = StyleSheet.create({
   },
   buttonLabel: {
     fontSize: 14,
-    fontFamily: fontType['Pjs-SemiBold'],
+    fontFamily: fontType['ppp-Medium'],
     color: colors.white(),
   },
   loadingOverlay: {
@@ -250,14 +333,20 @@ const textInput = StyleSheet.create({
     borderColor: colors.grey(0.4),
   },
   title: {
-    fontSize: 16,
-    fontFamily: fontType['Pjs-SemiBold'],
+    fontSize: 17,
+    fontFamily: fontType['pps-Mediun'],
+    color: colors.black(),
+    padding: 0,
+  },
+  price: {
+    fontSize: 14,
+    fontFamily: fontType['pps-Regular'],
     color: colors.black(),
     padding: 0,
   },
   content: {
     fontSize: 12,
-    fontFamily: fontType['Pjs-Regular'],
+    fontFamily: fontType['pps-Regular'],
     color: colors.black(),
     padding: 0,
   },
@@ -265,7 +354,7 @@ const textInput = StyleSheet.create({
 const category = StyleSheet.create({
   title: {
     fontSize: 12,
-    fontFamily: fontType['Pjs-Regular'],
+    fontFamily: fontType['pps-Regular'],
     color: colors.grey(0.6),
   },
   container: {
@@ -281,6 +370,6 @@ const category = StyleSheet.create({
   },
   name: {
     fontSize: 10,
-    fontFamily: fontType['Pjs-Medium'],
+    fontFamily: fontType['pps-Medium'],
   },
 });

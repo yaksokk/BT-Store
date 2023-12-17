@@ -1,34 +1,23 @@
-import {Animated, StyleSheet, Text, View, TouchableOpacity, ActivityIndicator} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import React, {useState, useRef, useEffect} from 'react';
+import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
 import {formatNumber} from '../../utils/formatNumber';
 import ActionSheet from 'react-native-actions-sheet';
+import storage from '@react-native-firebase/storage';
 import FastImage from 'react-native-fast-image';
 import {fontType, colors} from '../../theme';
 import axios from 'axios';
+import {
+  Animated,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 
 const BlogDetail = ({route}) => {
-  const {blogId} = route.params;
-  const [iconStates, setIconStates] = useState({
-    liked: {variant: 'Linear', color: colors.grey(0.6)},
-    bookmarked: {variant: 'Linear', color: colors.grey(0.6)},
-  });
-  // const selectedBlog = ListOfItems.find(blog => blog.id === blogId);
-  const navigation = useNavigation();
-  const toggleIcon = iconName => {
-    setIconStates(prevStates => ({
-      ...prevStates,
-      [iconName]: {
-        variant: prevStates[iconName].variant === 'Linear' ? 'Bold' : 'Linear',
-        color:
-          prevStates[iconName].variant === 'Linear'
-            ? colors.blue()
-            : colors.grey(0.6),
-      },
-    }));
-  };
-
   // Buat Animation
   const scrollY = useRef(new Animated.Value(0)).current;
   const diffClampY = Animated.diffClamp(scrollY, 0, 52);
@@ -41,55 +30,77 @@ const BlogDetail = ({route}) => {
     outputRange: [0, 52],
   });
 
-  // REST API
-  const [selectedBlog, setSelectedBlog] = useState(null);
+  const {blogId} = route.params;
+  const navigation = useNavigation();
+  const [iconStates, setIconStates] = useState({
+    liked: {variant: 'Linear', color: colors.grey(0.6)},
+    bookmarked: {variant: 'Linear', color: colors.grey(0.6)},
+  });
   const [loading, setLoading] = useState(true);
-
-  // default 23-31
+  const [selectedBlog, setSelectedBlog] = useState(null);
   const actionSheetRef = useRef(null);
-
   const openActionSheet = () => {
     actionSheetRef.current?.show();
   };
-
   const closeActionSheet = () => {
     actionSheetRef.current?.hide();
   };
-
   useEffect(() => {
-    getBlogById();
+    const subscriber = firestore()
+      .collection('blog')
+      .doc(blogId)
+      .onSnapshot(documentSnapshot => {
+        const blogData = documentSnapshot.data();
+        if (blogData) {
+          console.log('Blog data: ', blogData);
+          setSelectedBlog(blogData);
+        } else {
+          console.log(`Blog with ID ${blogId} not found.`);
+        }
+      });
+    setLoading(false);
+    return () => subscriber();
   }, [blogId]);
-
-  const getBlogById = async () => {
-    try {
-      const response = await axios.get(
-        `https://65641fc9ceac41c0761d7695.mockapi.io/wocoapp/blog/${blogId}`,
-      );
-      setSelectedBlog(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const navigateEdit = () => {
     closeActionSheet();
     navigation.navigate('EditBlog', {blogId});
   };
   const handleDelete = async () => {
-    await axios
-      .delete(
-        `https://65641fc9ceac41c0761d7695.mockapi.io/wocoapp/blog/${blogId}`,
-      )
-      .then(() => {
-        closeActionSheet();
-        navigation.navigate('Product');
-      })
-      .catch(error => {
-        console.error(error);
-      });
+    setLoading(true);
+    try {
+      await firestore()
+        .collection('blog')
+        .doc(blogId)
+        .delete()
+        .then(() => {
+          console.log('Blog deleted!');
+        });
+      if (selectedBlog?.image) {
+        const imageRef = storage().refFromURL(selectedBlog?.image);
+        await imageRef.delete();
+      }
+      console.log('Blog deleted!');
+      closeActionSheet();
+      setSelectedBlog(null);
+      setLoading(false);
+      navigation.navigate('Product');
+    } catch (error) {
+      console.error(error);
+    }
   };
 
+  const toggleIcon = iconName => {
+    setIconStates(prevStates => ({
+      ...prevStates,
+      [iconName]: {
+        variant: prevStates[iconName].variant === 'Linear' ? 'Bold' : 'Linear',
+        color:
+          prevStates[iconName].variant === 'Linear'
+            ? colors.blue()
+            : colors.grey(0.6),
+      },
+    }));
+  };
   return (
     <View style={styles.container}>
       <Animated.View
@@ -135,9 +146,10 @@ const BlogDetail = ({route}) => {
               marginTop: 15,
             }}>
             <Text style={styles.category}>{selectedBlog?.category.name}</Text>
-            <Text style={styles.price}>{selectedBlog?.price}</Text>
+            <Text style={styles.price}>Rp. {selectedBlog?.price}</Text>
           </View>
           <Text style={styles.title}>{selectedBlog?.title}</Text>
+          <Text style={styles.deskripsi}>Deskripsi Produk</Text>
           <Text style={styles.content}>{selectedBlog?.content}</Text>
         </Animated.ScrollView>
       )}
@@ -268,9 +280,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   category: {
-    fontFamily: fontType['mts-Medium'],
+    fontFamily: fontType['pps-Medium'],
     color: colors.blue(),
     fontSize: 14,
+  },
+  deskripsi: {
+    fontFamily: fontType['pps-Medium'],
+    color: colors.black(),
+    fontSize: 15,
+    marginTop:14,
   },
   price: {
     color: colors.black(0.7),
@@ -285,9 +303,9 @@ const styles = StyleSheet.create({
   },
   content: {
     color: colors.grey(),
-    fontFamily: fontType['Pjs-Medium'],
+    fontFamily: fontType['pps-Regular'],
     fontSize: 10,
     lineHeight: 20,
-    marginTop: 15,
+    marginTop: 7,
   },
 });

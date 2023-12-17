@@ -1,12 +1,10 @@
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import React, {useState, useEffect, useCallback} from 'react';
 import {RefreshControl} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {ProfileData, ListOfItems} from '../../../data';
-import {formatNumber} from '../../utils/formatNumber';
-import React, {useState, useCallback} from 'react';
+import firestore from '@react-native-firebase/firestore';
+import {useNavigation} from '@react-navigation/native';
 import {fontType, colors} from '../../theme';
 import {ItemSmall} from '../../components';
-import axios from 'axios';
 import {
   ActivityIndicator,
   ScrollView,
@@ -21,31 +19,41 @@ const Product = () => {
   const [loading, setLoading] = useState(true);
   const [blogData, setBlogData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const getDataBlog = async () => {
-    try {
-      const response = await axios.get(
-        'https://65641fc9ceac41c0761d7695.mockapi.io/wocoapp/blog',
-      );
-      setBlogData(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection('blog')
+      .onSnapshot(querySnapshot => {
+        const blogs = [];
+        querySnapshot.forEach(documentSnapshot => {
+          blogs.push({
+            ...documentSnapshot.data(),
+            id: documentSnapshot.id,
+          });
+        });
+        setBlogData(blogs);
+        setLoading(false);
+      });
+    return () => subscriber();
+  }, []);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
-      getDataBlog();
+      firestore()
+        .collection('blog')
+        .onSnapshot(querySnapshot => {
+          const blogs = [];
+          querySnapshot.forEach(documentSnapshot => {
+            blogs.push({
+              ...documentSnapshot.data(),
+              id: documentSnapshot.id,
+            });
+          });
+          setBlogData(blogs);
+        });
       setRefreshing(false);
     }, 1500);
   }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      getDataBlog();
-    }, []),
-  );
   return (
     <View style={styles.container}>
       <ScrollView
@@ -56,7 +64,7 @@ const Product = () => {
         <View style={styles.header}>
           <Text style={styles.title}>Product</Text>
         </View>
-        <View style={{paddingVertical: 10, gap: 10}}>
+        <View style={{padding: 14, gap: 10}}>
           {loading ? (
             <ActivityIndicator size={'large'} color={colors.blue()} />
           ) : (
@@ -78,6 +86,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white(),
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   header: {
     flex: 1,

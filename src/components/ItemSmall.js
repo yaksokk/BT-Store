@@ -30,7 +30,7 @@ const ItemSmall = ({item}) => {
           <View style={{gap: 5, flex: 1}}>
             <Text style={styles.cardCategory}>{item.category?.name}</Text>
             <Text style={styles.cardTitle}>{item?.title}</Text>
-            <Text style={styles.cardPrice}>{item?.price}</Text>
+            <Text style={styles.cardPrice}>Rp. {item?.price}</Text>
           </View>
           <Icon name="bookmark" size={20} color={colors.grey(0.7)} />
         </View>
@@ -53,23 +53,25 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   cardItem: {
-    backgroundColor: colors.blue(0.03),
+    backgroundColor: colors.blue(0.07),
     flexDirection: 'row',
     borderRadius: 10,
+    alignItems:'center',
+    paddingHorizontal:14,
   },
   cardCategory: {
     color: colors.blue(),
     fontSize: 10,
-    fontFamily: fontType['Pjs-SemiBold'],
+    fontFamily: fontType['pps-Medium'],
   },
   cardTitle: {
     fontSize: 14,
-    fontFamily: fontType['Pjs-Bold'],
+    fontFamily: fontType['pps-Bold'],
     color: colors.black(),
   },
   cardText: {
     fontSize: 10,
-    fontFamily: fontType['Pjs-Medium'],
+    fontFamily: fontType['pps-Medium'],
     color: colors.grey(0.6),
   },
   cardImage: {

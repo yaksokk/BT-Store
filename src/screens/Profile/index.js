@@ -1,12 +1,10 @@
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {formatNumber} from '../../utils/formatNumber';
-import React, {useState, useCallback} from 'react';
 import FastImage from 'react-native-fast-image';
 import {fontType, colors} from '../../theme';
 import {ProfileData} from '../../../data';
-import axios from 'axios';
-import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import React from 'react';
 
 const Profile = () => {
   return (
@@ -84,6 +82,7 @@ const Profile = () => {
 };
 
 export default Profile;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

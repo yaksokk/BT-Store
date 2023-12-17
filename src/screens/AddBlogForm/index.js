@@ -1,8 +1,11 @@
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import firestore from '@react-native-firebase/firestore';
+import ImagePicker from 'react-native-image-crop-picker';
 import {useNavigation} from '@react-navigation/native';
+import FastImage from 'react-native-fast-image';
+import storage from '@react-native-firebase/storage';
 import {fontType, colors} from '../../theme';
 import React, {useState} from 'react';
-import axios from 'axios';
 import {
   View,
   Text,
@@ -25,7 +28,7 @@ const AddBlogForm = () => {
     category: {},
     totalLikes: 0,
     totalComments: 0,
-    price:''
+    price: '',
   });
   const handleChange = (key, value) => {
     setBlogData({
@@ -40,30 +43,48 @@ const AddBlogForm = () => {
 
   // fungsi untuk handle API
   const handleUpload = async () => {
+    let filename = image.substring(image.lastIndexOf('/') + 1);
+    const extension = filename.split('.').pop();
+    const name = filename.split('.').slice(0, -1).join('.');
+    filename = name + Date.now() + '.' + extension;
+    const reference = storage().ref(`blogimages/${filename}`);
+
     setLoading(true);
     try {
-      await axios
-        .post('https://65641fc9ceac41c0761d7695.mockapi.io/wocoapp/blog', {
-          category: blogData.category,
-          title: blogData.title,
-          content: blogData.content,
-          image,
-          price: blogData.price,
-          totalComments: blogData.totalComments,
-          totalLikes: blogData.totalLikes,
-          createdAt: new Date(),
-        })
-        .then(function (response) {
-          console.log(response);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+      await reference.putFile(image);
+      const url = await reference.getDownloadURL();
+      await firestore().collection('blog').add({
+        title: blogData.title,
+        category: blogData.category,
+        price:blogData.price,
+        image: url,
+        content: blogData.content,
+        totalComments: blogData.totalComments,
+        totalLikes: blogData.totalLikes,
+        createdAt: new Date(),
+      });
       setLoading(false);
-      navigation.navigate('Profile');
-    } catch (e) {
-      console.log(e);
+      console.log('Blog added!');
+      navigation.navigate('Product');
+    } catch (error) {
+      console.log(error);
     }
+  };
+
+  const handleImagePick = async () => {
+    ImagePicker.openPicker({
+      width: 1920,
+      // height: 1080,
+      height: 1920,
+      cropping: true,
+    })
+      .then(image => {
+        console.log(image);
+        setImage(image.path);
+      })
+      .catch(error => {
+        console.log(error);
+      });
   };
 
   return (
@@ -104,32 +125,16 @@ const AddBlogForm = () => {
         </View>
         <View style={[textInput.borderDashed]}>
           <TextInput
-            placeholder="Image"
-            value={image}
-            onChangeText={text => setImage(text)}
-            placeholderTextColor={colors.grey(0.6)}
-            style={textInput.content}
-          />
-        </View>
-        <View style={[textInput.borderDashed]}>
-          <TextInput
-          placeholder='Price'
-          value={blogData.price}
+            placeholder="Price"
+            value={blogData.price}
             onChangeText={text => handleChange('price', text)}
             placeholderTextColor={colors.grey(0.6)}
             multiline
+            style={textInput.price}
           />
-
         </View>
         <View style={[textInput.borderDashed]}>
-          <Text
-            style={{
-              fontSize: 12,
-              fontFamily: fontType['pps-Regular'],
-              color: colors.grey(0.6),
-            }}>
-            Category
-          </Text>
+          <Text style={category.title}>Category</Text>
           <View style={category.container}>
             {dataCategory.map((item, index) => {
               const bgColor =
@@ -155,6 +160,58 @@ const AddBlogForm = () => {
             })}
           </View>
         </View>
+        {image ? (
+          <View style={{position: 'relative'}}>
+            <FastImage
+              style={{width: '100%', height: 127, borderRadius: 5}}
+              source={{
+                uri: image,
+                headers: {Authorization: 'someAuthToken'},
+                priority: FastImage.priority.high,
+              }}
+              resizeMode={FastImage.resizeMode.cover}
+            />
+            <TouchableOpacity
+              style={{
+                position: 'absolute',
+                top: -5,
+                right: -5,
+                backgroundColor: colors.blue(),
+                borderRadius: 25,
+              }}
+              onPress={() => setImage(null)}>
+              <Icon
+              name='plus'
+                size={20}
+                color={colors.white()}
+                style={{transform: [{rotate: '45deg'}]}}
+              />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity onPress={handleImagePick}>
+            <View
+              style={[
+                textInput.borderDashed,
+                {
+                  gap: 10,
+                  paddingVertical: 30,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                },
+              ]}>
+              <Icon name='plus' color={colors.grey(0.6)} size={42} />
+              <Text
+                style={{
+                  fontFamily: fontType['Pjs-Regular'],
+                  fontSize: 12,
+                  color: colors.grey(0.6),
+                }}>
+                Upload Thumbnail
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
       </ScrollView>
       <View style={styles.bottomBar}>
         <TouchableOpacity style={styles.button} onPress={handleUpload}>
@@ -239,8 +296,14 @@ const textInput = StyleSheet.create({
     borderColor: colors.grey(0.4),
   },
   title: {
-    fontSize: 16,
+    fontSize: 17,
     fontFamily: fontType['pps-Medium'],
+    color: colors.black(),
+    padding: 0,
+  },
+  price: {
+    fontSize: 14,
+    fontFamily: fontType['pps-Regular'],
     color: colors.black(),
     padding: 0,
   },
