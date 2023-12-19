@@ -2,20 +2,22 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import {useNavigation} from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
 import {fontType, colors} from '../theme';
-import {ListOfItems} from '../../data';
 import React, {useState} from 'react';
 import {
   StyleSheet,
   Text,
   View,
   FlatList,
-  SafeAreaView,
-  SectionList,
   TouchableOpacity,
 } from 'react-native';
 
-const ContainerItem = ({item, onPress}) => {
+const ContainerItem = ({item}) => {
   const navigation = useNavigation();
+  const [selected, setSelected] = useState()
+  const  klik = () => {
+    setSelected(!selected)
+  }
+  const colorSelect = !selected ? colors.grey(.7) : colors.red()
   return (
     <TouchableOpacity
       style={listItems.cardItem}
@@ -23,18 +25,19 @@ const ContainerItem = ({item, onPress}) => {
       <FastImage
         style={listItems.cardImage}
         source={{
-          uri: item.image,
+          uri: item?.image,
           headers: {Authorization: 'someAuthToken'},
           priority: FastImage.priority.high,
         }}
         resizeMode={FastImage.resizeMode.cover}></FastImage>
       <View style={listItems.cardContent}>
         <View style={listItems.cardInfo}>
-          <Text style={listItems.cardTitle}>{item.name}</Text>
-          <Text style={listItems.cardText}>{item.price}</Text>
+          <Text style={listItems.cardCategory}>{item.category?.name}</Text>
+          <Text style={listItems.cardTitle}>{item?.title}</Text>
+          <Text style={listItems.cardPrice}>{item?.price}</Text>
         </View>
-        <TouchableOpacity style={listItems.cardIcon} onPress={onPress}>
-          <Icon name="heart" size={21} color={colors.black()} />
+        <TouchableOpacity style={listItems.cardIcon} onPress={klik}>
+          <Icon name="heart" solid size={21} color={colorSelect} />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -64,9 +67,11 @@ const ListItems = ({data, numColumns}) => {
       data={data}
       keyExtractor={item => item.id}
       renderItem={item => renderItem({...item})}
-      showsHorizontalScrollIndicator={false}
       numColumns={numColumns}
       ItemSeparatorComponent={() => <View style={{width: 15}} />}
+      scrollEnabled={false}
+      // horizontal
+      // showsHorizontalScrollIndicator={false}
     />
   );
 };
@@ -94,8 +99,13 @@ const listItems = StyleSheet.create({
     maxWidth: '100%',
   },
   cardInfo: {
-    paddingHorizontal: 7,
+    paddingLeft: 10,
     width: '75%',
+  },
+  cardCategory: {
+    fontSize: 10,
+    color: colors.blue(),
+    fontFamily: fontType['pps-Regular'],
   },
   cardTitle: {
     fontFamily: fontType['pps-Regular'],
@@ -103,10 +113,11 @@ const listItems = StyleSheet.create({
     flexWrap: 'wrap',
     fontSize: 14,
   },
-  cardText: {
+  cardPrice: {
     color: colors.black(),
     fontFamily: fontType['pps-Regular'],
     fontSize: 10,
+    marginTop: 7,
   },
   cardIcon: {
     alignItems: 'center',

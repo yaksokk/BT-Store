@@ -1,7 +1,8 @@
 import { StyleSheet, View } from "react-native";
-import { fontType, colors } from "../../theme";
+import { colors } from "../../theme";
 import { SearchBar } from "../../components";
 import React, { useState } from "react";
+
 const Search = () => {
   const [searchPhrase, setSearchPhrase] = useState("");
   return (
@@ -15,7 +16,9 @@ const Search = () => {
     </View>
   );
 };
+
 export default Search;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -4,8 +4,8 @@ import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
 import storage from '@react-native-firebase/storage';
 import React, {useEffect, useState} from 'react';
-import {fontType, colors} from '../../theme';
 import FastImage from 'react-native-fast-image';
+import {fontType, colors} from '../../theme';
 import {
   View,
   Text,
@@ -167,7 +167,7 @@ const EditBlogForm = ({route}) => {
           <Text
             style={{
               fontSize: 12,
-              fontFamily: fontType['Pjs-Regular'],
+              fontFamily: fontType['pps-Regular'],
               color: colors.grey(0.6),
             }}>
             Category
@@ -240,7 +240,7 @@ const EditBlogForm = ({route}) => {
               <Icon name='plus' color={colors.grey(0.6)} size={42} />
               <Text
                 style={{
-                  fontFamily: fontType['Pjs-Regular'],
+                  fontFamily: fontType['pps-Regular'],
                   fontSize: 12,
                   color: colors.grey(0.6),
                 }}>
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   },
   buttonLabel: {
     fontSize: 14,
-    fontFamily: fontType['ppp-Medium'],
+    fontFamily: fontType['pps-Medium'],
     color: colors.white(),
   },
   loadingOverlay: {
@@ -323,7 +323,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-});
+})
+
 const textInput = StyleSheet.create({
   borderDashed: {
     borderStyle: 'dashed',
@@ -350,7 +351,8 @@ const textInput = StyleSheet.create({
     color: colors.black(),
     padding: 0,
   },
-});
+})
+
 const category = StyleSheet.create({
   title: {
     fontSize: 12,

@@ -1,12 +1,91 @@
-import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import {formatNumber} from '../../utils/formatNumber';
-import FastImage from 'react-native-fast-image';
-import {fontType, colors} from '../../theme';
-import {ProfileData} from '../../../data';
-import React from 'react';
+import {StyleSheet, Text, View, TouchableOpacity} from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import Icon from 'react-native-vector-icons/FontAwesome5'
+import React, {useEffect, useState, useRef} from 'react'
+import firestore from '@react-native-firebase/firestore'
+import {useNavigation} from '@react-navigation/native';
+import {formatNumber} from '../../utils/formatNumber'
+import ActionSheet from 'react-native-actions-sheet'
+import FastImage from 'react-native-fast-image'
+import auth from '@react-native-firebase/auth'
+import {fontType, colors} from '../../theme'
 
 const Profile = () => {
+  const navigation = useNavigation();
+  const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [blogData, setBlogData] = useState([]);
+  const actionSheetRef = useRef(null);
+  const openActionSheet = () => {
+    actionSheetRef.current?.show();
+  };
+  const closeActionSheet = () => {
+    actionSheetRef.current?.hide();
+  };
+  useEffect(() => {
+    const user = auth().currentUser;
+    const fetchBlogData = () => {
+      try {
+        if (user) {
+          const userId = user.uid;
+          const blogCollection = firestore().collection('blog');
+          const query = blogCollection.where('authorId', '==', userId);
+          const unsubscribeBlog = query.onSnapshot(querySnapshot => {
+            const blogs = querySnapshot.docs.map(doc => ({
+              ...doc.data(),
+              id: doc.id,
+            }));
+            setBlogData(blogs);
+            setLoading(false);
+          });
+
+          return () => {
+            unsubscribeBlog();
+          };
+        }
+      } catch (error) {
+        console.error('Error fetching blog data:', error);
+      }
+    };
+
+    const fetchProfileData = () => {
+      try {
+        const user = auth().currentUser;
+        if (user) {
+          const userId = user.uid;
+          const userRef = firestore().collection('users').doc(userId);
+
+          const unsubscribeProfile = userRef.onSnapshot(doc => {
+            if (doc.exists) {
+              const userData = doc.data();
+              setProfileData(userData);
+              fetchBlogData();
+            } else {
+              console.error('Dokumen pengguna tidak ditemukan.');
+            }
+          });
+
+          return () => {
+            unsubscribeProfile();
+          };
+        }
+      } catch (error) {
+        console.error('Error fetching profile data:', error);
+      }
+    };
+    fetchBlogData();
+    fetchProfileData();
+  }, []);
+  const handleLogout = async () => {
+    try {
+      closeActionSheet();
+      await auth().signOut();
+      await AsyncStorage.removeItem('userData');
+      navigation.replace('Login');
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}></View>
@@ -15,36 +94,35 @@ const Profile = () => {
           height: '100%',
           gap: 10,
           alignItems: 'center',
-          paddingHorizontal:21,
-          top:70
-
+          paddingHorizontal: 21,
+          top: 70,
         }}>
         <FastImage
           style={profile.pic}
           source={{
-            uri: ProfileData.profilePict,
+            uri: profileData?.photoUrl,
             headers: {Authorization: 'someAuthToken'},
             priority: FastImage.priority.high,
           }}
           resizeMode={FastImage.resizeMode.cover}
         />
         <View style={{gap: 5, alignItems: 'center'}}>
-          <Text style={profile.name}>{ProfileData.name}</Text>
+          <Text style={profile.name}>{profileData?.fullName}</Text>
         </View>
         <View style={{flexDirection: 'row', gap: 20}}>
           <View style={{alignItems: 'center', gap: 5}}>
-            <Text style={profile.sum}>{ProfileData.blogPosted}</Text>
+            <Text style={profile.sum}>{profileData?.totalPost}</Text>
             <Text style={profile.tag}>Product</Text>
           </View>
           <View style={{alignItems: 'center', gap: 5}}>
             <Text style={profile.sum}>
-              {formatNumber(ProfileData.following)}
+              {formatNumber(profileData?.followingCount)}
             </Text>
             <Text style={profile.tag}>Following</Text>
           </View>
           <View style={{alignItems: 'center', gap: 5}}>
             <Text style={profile.sum}>
-              {formatNumber(ProfileData.follower)}
+              {formatNumber(profileData?.followersCount)}
             </Text>
             <Text style={profile.tag}>Follower</Text>
           </View>
@@ -71,12 +149,56 @@ const Profile = () => {
             />
             <Text style={styles.title}>Help & FAQ</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={openActionSheet}>
             <Icon name="sign-out-alt" size={17} color={colors.black()} />
             <Text style={styles.title}>Log Out</Text>
           </TouchableOpacity>
         </View>
       </View>
+      <ActionSheet
+        ref={actionSheetRef}
+        containerStyle={{
+          borderTopLeftRadius: 25,
+          borderTopRightRadius: 25,
+        }}
+        indicatorStyle={{
+          width: 100,
+        }}
+        gestureEnabled={true}
+        defaultOverlayOpacity={0.3}>
+        <TouchableOpacity
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingVertical: 15,
+          }}
+          onPress={handleLogout}>
+          <Text
+            style={{
+              fontFamily: fontType['pps-Medium'],
+              color: colors.black(),
+              fontSize: 18,
+            }}>
+            Log out
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingVertical: 15,
+          }}
+          onPress={closeActionSheet}>
+          <Text
+            style={{
+              fontFamily: fontType['pps-Medium'],
+              color: 'red',
+              fontSize: 18,
+            }}>
+            Cancel
+          </Text>
+        </TouchableOpacity>
+      </ActionSheet>
     </View>
   );
 };
@@ -88,12 +210,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    backgroundColor: colors.blue(.9),
-    position:'absolute',
+    backgroundColor: colors.blue(0.9),
+    position: 'absolute',
     height: 125,
-    top:0,
-    left:0,
-    right:0,
+    top: 0,
+    left: 0,
+    right: 0,
   },
   borders: {
     borderColor: colors.black(0.7),
@@ -150,7 +272,7 @@ const profile = StyleSheet.create({
   },
   tag: {
     fontFamily: fontType['pps-Regular'],
-    color: colors.grey(0.5),
+    color: colors.grey(0.7),
     fontSize: 14,
   },
 });

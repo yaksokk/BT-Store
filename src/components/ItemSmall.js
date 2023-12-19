@@ -1,13 +1,18 @@
 import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {useNavigation} from '@react-navigation/native';
-import { formatDate } from '../utils/formatDate';
+import {formatDate} from '../utils/formatDate';
 import FastImage from 'react-native-fast-image';
 import {fontType, colors} from '../theme';
-import React from 'react';
+import React, {useState} from 'react';
 
 const ItemSmall = ({item}) => {
   const navigation = useNavigation();
+  const [selected, setSelected] = useState()
+  const  klik = () => {
+    setSelected(!selected)
+  }
+  const colorSelect = !selected ? colors.grey(.7) : colors.red()
   return (
     <TouchableOpacity
       style={styles.cardItem}
@@ -32,7 +37,9 @@ const ItemSmall = ({item}) => {
             <Text style={styles.cardTitle}>{item?.title}</Text>
             <Text style={styles.cardPrice}>Rp. {item?.price}</Text>
           </View>
-          <Icon name="bookmark" size={20} color={colors.grey(0.7)} />
+          <TouchableOpacity onPress={klik}>
+            <Icon name="heart" solid size={20} color={colorSelect} />
+          </TouchableOpacity>
         </View>
         <View style={styles.cardInfo}>
           <Icon name="clock" size={10} color={colors.grey(0.7)} />
@@ -56,8 +63,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.blue(0.07),
     flexDirection: 'row',
     borderRadius: 10,
-    alignItems:'center',
-    paddingHorizontal:14,
+    alignItems: 'center',
+    paddingHorizontal: 14,
   },
   cardCategory: {
     color: colors.blue(),
@@ -93,9 +100,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
   },
-  cardPrice:{
-    color: colors.grey(.7),
+  cardPrice: {
+    color: colors.grey(0.7),
     fontFamily: fontType['pps-Regular'],
-    fontSize:12,
+    fontSize: 12,
   },
 });

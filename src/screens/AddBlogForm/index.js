@@ -2,8 +2,9 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import firestore from '@react-native-firebase/firestore';
 import ImagePicker from 'react-native-image-crop-picker';
 import {useNavigation} from '@react-navigation/native';
-import FastImage from 'react-native-fast-image';
 import storage from '@react-native-firebase/storage';
+import FastImage from 'react-native-fast-image';
+import auth from '@react-native-firebase/auth';
 import {fontType, colors} from '../../theme';
 import React, {useState} from 'react';
 import {
@@ -14,6 +15,7 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  KeyboardAvoidingView
 } from 'react-native';
 
 const AddBlogForm = () => {
@@ -43,6 +45,7 @@ const AddBlogForm = () => {
 
   // fungsi untuk handle API
   const handleUpload = async () => {
+    const authorId = auth().currentUser.uid;
     let filename = image.substring(image.lastIndexOf('/') + 1);
     const extension = filename.split('.').pop();
     const name = filename.split('.').slice(0, -1).join('.');
@@ -56,12 +59,13 @@ const AddBlogForm = () => {
       await firestore().collection('blog').add({
         title: blogData.title,
         category: blogData.category,
-        price:blogData.price,
+        price: blogData.price,
         image: url,
         content: blogData.content,
         totalComments: blogData.totalComments,
         totalLikes: blogData.totalLikes,
         createdAt: new Date(),
+        authorId
       });
       setLoading(false);
       console.log('Blog added!');
@@ -88,142 +92,147 @@ const AddBlogForm = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="long-arrow-alt-left" size={24} color={colors.black()} />
-        </TouchableOpacity>
-        <View style={{flex: 1, alignItems: 'center'}}>
-          <Text style={styles.title}>Write blog</Text>
-        </View>
-      </View>
-      <ScrollView
-        contentContainerStyle={{
-          paddingHorizontal: 24,
-          paddingVertical: 10,
-          gap: 10,
-        }}>
-        <View style={textInput.borderDashed}>
-          <TextInput
-            placeholder="Title"
-            value={blogData.title}
-            onChangeText={text => handleChange('title', text)}
-            placeholderTextColor={colors.grey(0.6)}
-            multiline
-            style={textInput.title}
-          />
-        </View>
-        <View style={[textInput.borderDashed, {minHeight: 250}]}>
-          <TextInput
-            placeholder="Content"
-            value={blogData.content}
-            onChangeText={text => handleChange('content', text)}
-            placeholderTextColor={colors.grey(0.6)}
-            multiline
-            style={textInput.content}
-          />
-        </View>
-        <View style={[textInput.borderDashed]}>
-          <TextInput
-            placeholder="Price"
-            value={blogData.price}
-            onChangeText={text => handleChange('price', text)}
-            placeholderTextColor={colors.grey(0.6)}
-            multiline
-            style={textInput.price}
-          />
-        </View>
-        <View style={[textInput.borderDashed]}>
-          <Text style={category.title}>Category</Text>
-          <View style={category.container}>
-            {dataCategory.map((item, index) => {
-              const bgColor =
-                item.id === blogData.category.id
-                  ? colors.black()
-                  : colors.grey(0.08);
-              const color =
-                item.id === blogData.category.id
-                  ? colors.white()
-                  : colors.grey();
-              return (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() =>
-                    handleChange('category', {id: item.id, name: item.name})
-                  }
-                  style={[category.item, {backgroundColor: bgColor}]}>
-                  <Text style={[category.name, {color: color}]}>
-                    {item.name}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
-        {image ? (
-          <View style={{position: 'relative'}}>
-            <FastImage
-              style={{width: '100%', height: 127, borderRadius: 5}}
-              source={{
-                uri: image,
-                headers: {Authorization: 'someAuthToken'},
-                priority: FastImage.priority.high,
-              }}
-              resizeMode={FastImage.resizeMode.cover}
-            />
-            <TouchableOpacity
-              style={{
-                position: 'absolute',
-                top: -5,
-                right: -5,
-                backgroundColor: colors.blue(),
-                borderRadius: 25,
-              }}
-              onPress={() => setImage(null)}>
-              <Icon
-              name='plus'
-                size={20}
-                color={colors.white()}
-                style={{transform: [{rotate: '45deg'}]}}
-              />
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <TouchableOpacity onPress={handleImagePick}>
-            <View
-              style={[
-                textInput.borderDashed,
-                {
-                  gap: 10,
-                  paddingVertical: 30,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                },
-              ]}>
-              <Icon name='plus' color={colors.grey(0.6)} size={42} />
-              <Text
-                style={{
-                  fontFamily: fontType['Pjs-Regular'],
-                  fontSize: 12,
-                  color: colors.grey(0.6),
-                }}>
-                Upload Thumbnail
-              </Text>
-            </View>
+    <KeyboardAvoidingView
+      style={{flex: 1}}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      enabled>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon name="long-arrow-alt-left" size={24} color={colors.black()} />
           </TouchableOpacity>
-        )}
-      </ScrollView>
-      <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.button} onPress={handleUpload}>
-          <Text style={styles.buttonLabel}>Upload</Text>
-        </TouchableOpacity>
-      </View>
-      {loading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={colors.blue()} />
+          <View style={{flex: 1, alignItems: 'center'}}>
+            <Text style={styles.title}>Write blog</Text>
+          </View>
         </View>
-      )}
-    </View>
+        <ScrollView
+          contentContainerStyle={{
+            paddingHorizontal: 24,
+            paddingVertical: 10,
+            gap: 10,
+          }}>
+          <View style={textInput.borderDashed}>
+            <TextInput
+              placeholder="Title"
+              value={blogData.title}
+              onChangeText={text => handleChange('title', text)}
+              placeholderTextColor={colors.grey(0.6)}
+              multiline
+              style={textInput.title}
+            />
+          </View>
+          <View style={[textInput.borderDashed, {minHeight: 250}]}>
+            <TextInput
+              placeholder="Content"
+              value={blogData.content}
+              onChangeText={text => handleChange('content', text)}
+              placeholderTextColor={colors.grey(0.6)}
+              multiline
+              style={textInput.content}
+            />
+          </View>
+          <View style={[textInput.borderDashed]}>
+            <TextInput
+              placeholder="Price ( 1.000.000.000)"
+              value={blogData.price}
+              onChangeText={text => handleChange('price', text)}
+              placeholderTextColor={colors.grey(0.6)}
+              multiline
+              style={textInput.price}
+            />
+          </View>
+          <View style={[textInput.borderDashed]}>
+            <Text style={category.title}>Category</Text>
+            <View style={category.container}>
+              {dataCategory.map((item, index) => {
+                const bgColor =
+                  item.id === blogData.category.id
+                    ? colors.black()
+                    : colors.grey(0.08);
+                const color =
+                  item.id === blogData.category.id
+                    ? colors.white()
+                    : colors.grey();
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() =>
+                      handleChange('category', {id: item.id, name: item.name})
+                    }
+                    style={[category.item, {backgroundColor: bgColor}]}>
+                    <Text style={[category.name, {color: color}]}>
+                      {item.name}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+          {image ? (
+            <View style={{position: 'relative'}}>
+              <FastImage
+                style={{width: '100%', height: 127, borderRadius: 5}}
+                source={{
+                  uri: image,
+                  headers: {Authorization: 'someAuthToken'},
+                  priority: FastImage.priority.high,
+                }}
+                resizeMode={FastImage.resizeMode.cover}
+              />
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  top: -5,
+                  right: -5,
+                  backgroundColor: colors.blue(),
+                  borderRadius: 25,
+                }}
+                onPress={() => setImage(null)}>
+                <Icon
+                  name="plus"
+                  size={20}
+                  color={colors.white()}
+                  style={{transform: [{rotate: '45deg'}]}}
+                />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity onPress={handleImagePick}>
+              <View
+                style={[
+                  textInput.borderDashed,
+                  {
+                    gap: 10,
+                    paddingVertical: 30,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  },
+                ]}>
+                <Icon name="plus" color={colors.grey(0.6)} size={42} />
+                <Text
+                  style={{
+                    fontFamily: fontType['Pjs-Regular'],
+                    fontSize: 12,
+                    color: colors.grey(0.6),
+                  }}>
+                  Upload Thumbnail
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        </ScrollView>
+        <View style={styles.bottomBar}>
+          <TouchableOpacity style={styles.button} onPress={handleUpload}>
+            <Text style={styles.buttonLabel}>Upload</Text>
+          </TouchableOpacity>
+        </View>
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color={colors.blue()} />
+          </View>
+        )}
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 

@@ -1,18 +1,20 @@
+import Icon from 'react-native-vector-icons/FontAwesome5'
+import {useNavigation} from '@react-navigation/native'
+import React, { useRef, useEffect} from 'react'
+import {fontType, colors} from '../theme'
 import {
   StyleSheet,
   View,
   TextInput,
   Animated,
   TouchableOpacity,
-} from 'react-native';
-import React, {useState, useRef, useEffect} from 'react';
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import {fontType, colors} from '../theme';
-import {useNavigation} from '@react-navigation/native';
+} from 'react-native'
 
 const SearchBar = ({searchPhrase, setSearchPhrase}) => {
+
   const navigation = useNavigation();
   const animation = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     Animated.timing(animation, {
       toValue: 1,
@@ -47,11 +49,11 @@ const SearchBar = ({searchPhrase, setSearchPhrase}) => {
         </TouchableOpacity>
       </Animated.View>
       <View style={styles.bar}>
-        <Icon name="search" size={24} color={colors.black()} />
+        <Icon name="search" size={21} color={colors.black()} />
         <TextInput
           style={styles.textinput}
           placeholder="Search"
-          placeholderTextColor={colors.grey(0.5)}
+          placeholderTextColor={colors.grey(0.7)}
           value={searchPhrase}
           onChangeText={setSearchPhrase}
           borderWidth={0}
@@ -93,9 +95,9 @@ const styles = StyleSheet.create({
   },
   textinput: {
     fontSize: 14,
-    fontFamily: fontType['Pjs-Medium'],
+    fontFamily: fontType['pps-Medium'],
     color: colors.black(),
-    lineHeight: 18,
+    lineHeight: 21,
     padding: 0,
     flex: 1,
   },

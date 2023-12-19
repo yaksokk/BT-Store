@@ -1,13 +1,13 @@
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import React, {useState, useRef, useEffect} from 'react';
-import firestore from '@react-native-firebase/firestore';
-import {useNavigation} from '@react-navigation/native';
-import {formatNumber} from '../../utils/formatNumber';
-import ActionSheet from 'react-native-actions-sheet';
-import storage from '@react-native-firebase/storage';
-import FastImage from 'react-native-fast-image';
-import {fontType, colors} from '../../theme';
-import axios from 'axios';
+import Icon from 'react-native-vector-icons/FontAwesome5'
+import React, {useState, useRef, useEffect} from 'react'
+import firestore from '@react-native-firebase/firestore'
+import {useNavigation} from '@react-navigation/native'
+import {formatNumber} from '../../utils/formatNumber'
+import storage from '@react-native-firebase/storage'
+import ActionSheet from 'react-native-actions-sheet'
+import FastImage from 'react-native-fast-image'
+import auth from '@react-native-firebase/auth'
+import {fontType, colors} from '../../theme'
 import {
   Animated,
   StyleSheet,
@@ -30,6 +30,7 @@ const BlogDetail = ({route}) => {
     outputRange: [0, 52],
   });
 
+  
   const {blogId} = route.params;
   const navigation = useNavigation();
   const [iconStates, setIconStates] = useState({
@@ -38,6 +39,7 @@ const BlogDetail = ({route}) => {
   });
   const [loading, setLoading] = useState(true);
   const [selectedBlog, setSelectedBlog] = useState(null);
+  const userId = auth().currentUser.uid;
   const actionSheetRef = useRef(null);
   const openActionSheet = () => {
     actionSheetRef.current?.show();
@@ -93,7 +95,6 @@ const BlogDetail = ({route}) => {
     setIconStates(prevStates => ({
       ...prevStates,
       [iconName]: {
-        variant: prevStates[iconName].variant === 'Linear' ? 'Bold' : 'Linear',
         color:
           prevStates[iconName].variant === 'Linear'
             ? colors.blue()

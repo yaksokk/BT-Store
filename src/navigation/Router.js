@@ -4,15 +4,19 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import {fontType, colors} from '../theme';
 import React from 'react';
 import {
-  Home,
-  Profile,
-  BlogDetail,
-  Wishlist,
-  Search,
-  AddBlogForm,
+  SplashScreen,
   EditBlogForm,
-  Product
+  AddBlogForm,
+  BlogDetail,
+  Register,
+  Wishlist,
+  Profile,
+  Product,
+  Search,
+  Login,
+  Home,
 } from '../screens';
+
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 function MainApp() {
@@ -56,7 +60,9 @@ function MainApp() {
         component={Product}
         options={{
           tabBarLabel: 'Product',
-          tabBarIcon: ({color}) => <Icon name="product-hunt" size={17} color={color} />,
+          tabBarIcon: ({color}) => (
+            <Icon name="product-hunt" size={17} color={color} />
+          ),
           headerShown: false,
         }}
       />
@@ -74,7 +80,7 @@ function MainApp() {
 }
 const Router = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName="SplashScreen">
       <Stack.Screen
         name="MainApp"
         component={MainApp}
@@ -123,6 +129,21 @@ const Router = () => {
           gestureDirection: 'horizontal',
           ...TransitionPresets.SlideFromRightIOS,
         }}
+      />
+      <Stack.Screen
+        name="SplashScreen"
+        component={SplashScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Register"
+        component={Register}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Login"
+        component={Login}
+        options={{headerShown: false}}
       />
     </Stack.Navigator>
   );

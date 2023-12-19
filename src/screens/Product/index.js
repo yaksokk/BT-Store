@@ -1,10 +1,11 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {RefreshControl} from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import firestore from '@react-native-firebase/firestore';
-import {useNavigation} from '@react-navigation/native';
-import {fontType, colors} from '../../theme';
-import {ItemSmall} from '../../components';
+import React, {useState, useEffect, useCallback} from 'react'
+import {RefreshControl} from 'react-native-gesture-handler'
+import Icon from 'react-native-vector-icons/FontAwesome5'
+import firestore from '@react-native-firebase/firestore'
+import {useNavigation} from '@react-navigation/native'
+import auth from '@react-native-firebase/auth'
+import {fontType, colors} from '../../theme'
+import {ItemSmall} from '../../components'
 import {
   ActivityIndicator,
   ScrollView,
@@ -12,7 +13,7 @@ import {
   Text,
   View,
   TouchableOpacity,
-} from 'react-native';
+} from 'react-native'
 
 const Product = () => {
   const navigation = useNavigation();
@@ -20,20 +21,32 @@ const Product = () => {
   const [blogData, setBlogData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   useEffect(() => {
-    const subscriber = firestore()
-      .collection('blog')
-      .onSnapshot(querySnapshot => {
-        const blogs = [];
-        querySnapshot.forEach(documentSnapshot => {
-          blogs.push({
-            ...documentSnapshot.data(),
-            id: documentSnapshot.id,
+    const user = auth().currentUser;
+    const fetchBlogData = () => {
+      try {
+        if (user) {
+          const userId = user.uid;
+          const blogCollection = firestore().collection('blog');
+          const query = blogCollection.where('authorId', '==', userId);
+          const unsubscribeBlog = query.onSnapshot(querySnapshot => {
+            const blogs = querySnapshot.docs.map(doc => ({
+              ...doc.data(),
+              id: doc.id,
+            }));
+            setBlogData(blogs);
+            setLoading(false);
           });
-        });
-        setBlogData(blogs);
-        setLoading(false);
-      });
-    return () => subscriber();
+
+          return () => {
+            unsubscribeBlog();
+          };
+        }
+      } catch (error) {
+        console.error('Error fetching blog data:', error);
+      }
+    };
+
+    fetchBlogData();
   }, []);
 
   const onRefresh = useCallback(() => {

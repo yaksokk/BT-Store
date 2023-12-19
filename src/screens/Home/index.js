@@ -1,8 +1,10 @@
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {CategoryList, ListOfItems} from '../../../data';
+import React, {useState, useRef, useEffect} from 'react';
+import firestore from '@react-native-firebase/firestore';
+import {CategoryList} from '../../../data';
 import {useNavigation} from '@react-navigation/native';
+import auth from '@react-native-firebase/auth'
 import {fontType, colors} from './../../theme';
-import React, {useState, useRef} from 'react';
 import {ListItems} from './../../components';
 import {
   Animated,
@@ -12,18 +14,52 @@ import {
   View,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  ActivityIndicator,
 } from 'react-native';
 
-export default function Home() {
+const Home = () => {
+  const navigation = useNavigation();
   const scrollY = useRef(new Animated.Value(0)).current;
-  const diffClampY = Animated.diffClamp(scrollY, 0, 142);
+  const diffClampY = Animated.diffClamp(scrollY, 0, 200);
   const recentY = diffClampY.interpolate({
-    inputRange: [0, 142],
-    outputRange: [0, -142],
+    inputRange: [0, 200],
+    outputRange: [0, -200],
     extrapolate: 'clamp',
   });
 
-  const navigation = useNavigation();
+  const [loading, setLoading] = useState(true);
+  const [blogData, setBlogData] = useState([]);
+  useEffect(() => {
+    const user = auth().currentUser;
+    const fetchBlogData = () => {
+      try {
+        if (user) {
+          const userId = user.uid;
+          const blogCollection = firestore().collection('blog');
+          const query = blogCollection.where('authorId', '==', userId);
+          const unsubscribeBlog = query.onSnapshot(querySnapshot => {
+            const blogs = querySnapshot.docs.map(doc => ({
+              ...doc.data(),
+              id: doc.id,
+            }));
+            setBlogData(blogs);
+            setLoading(false);
+          });
+
+          return () => {
+            unsubscribeBlog();
+          };
+        }
+      } catch (error) {
+        console.error('Error fetching blog data:', error);
+      }
+    };
+
+    fetchBlogData();
+  }, []);
+
+  const listData = blogData
+
   return (
     <View style={styles.container}>
       <View style={[styles.top]}>
@@ -34,18 +70,10 @@ export default function Home() {
             <Text style={styles.placeholder}>Search</Text>
           </View>
         </TouchableWithoutFeedback>
-        <View style={{flexDirection: 'row', gap: 7}}>
-          <TouchableOpacity>
-            <Icon name="heart" solid size={24} color={colors.black()} />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Icon name="shopping-cart" size={24} color={colors.black()} />
-          </TouchableOpacity>
-        </View>
       </View>
       <Animated.View
         style={[
-          styles.animatiedContainer,
+          styles.animatedContainer,
           {transform: [{translateY: recentY}]},
         ]}>
         <Text style={styles.title}>Discover Your Badminton Look</Text>
@@ -60,13 +88,20 @@ export default function Home() {
           {useNativeDriver: true},
         )}
         contentContainerStyle={{paddingTop: 200}}>
-        <View style={styles.containerItem}>
-          <ListItems data={ListOfItems} numColumns={2} />
-        </View>
+        {loading ? (
+          <ActivityIndicator size={'large'} color={colors.blue()} />
+        ) : (
+          <View style={styles.containerItem}>
+            <ListItems data={listData} numColumns={2} />
+            
+          </View>
+        )}
       </Animated.ScrollView>
     </View>
   );
-}
+};
+
+export default Home;
 
 const ListCategory = () => {
   const [selected, setSelected] = useState(1);
@@ -105,6 +140,7 @@ const ItemCategory = ({item, onPress, color}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.white(),
   },
   top: {
     backgroundColor: colors.white(),
@@ -124,7 +160,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     borderRadius: 7,
-    width: '75%',
+    width: '90%',
     padding: 10,
     gap: 7,
   },
@@ -146,7 +182,7 @@ const styles = StyleSheet.create({
     color: colors.black(),
     textAlign: 'center',
   },
-  animatiedContainer: {
+  animatedContainer: {
     position: 'absolute',
     backgroundColor: colors.white(),
     borderRadius: 14,
@@ -160,7 +196,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white(),
     paddingBottom: 70,
     paddingTop: 14,
-    top: 55,
+    paddingTop:70,
+    justifyContent:'center'
   },
 });
 
