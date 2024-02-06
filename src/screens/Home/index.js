@@ -5,7 +5,7 @@ import {CategoryList} from '../../../data';
 import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth'
 import {fontType, colors} from './../../theme';
-import {ListItems} from './../../components';
+import {ListItems, ListHorizontal} from './../../components';
 import {
   Animated,
   FlatList,
@@ -59,7 +59,7 @@ const Home = () => {
   }, []);
 
   const listData = blogData
-
+  const horizontalData = blogData
   return (
     <View style={styles.container}>
       <View style={[styles.top]}>
@@ -92,8 +92,10 @@ const Home = () => {
           <ActivityIndicator size={'large'} color={colors.blue()} />
         ) : (
           <View style={styles.containerItem}>
+            <ListHorizontal data={horizontalData}/>
+            <View style={styles.listCard}>
             <ListItems data={listData} numColumns={2} />
-            
+            </View>
           </View>
         )}
       </Animated.ScrollView>
@@ -198,6 +200,9 @@ const styles = StyleSheet.create({
     paddingTop: 14,
     paddingTop:70,
     justifyContent:'center'
+  },
+  listCard:{
+    marginTop:20,
   },
 });
 
